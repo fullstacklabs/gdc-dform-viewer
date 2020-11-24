@@ -1,10 +1,10 @@
 import React from 'react'
 
-import { ExampleComponent } from 'gdc-df-render'
-import 'gdc-df-render/dist/index.css'
+import { DFormViewer } from 'gdc-dform-viewer'
+import 'gdc-dform-viewer/dist/index.css'
 
 const App = () => {
-  return <ExampleComponent text="Create React Library Example 😄" />
+  return <DFormViewer form={{sections: [{fields: []}]}} />
 }
 
 export default App
