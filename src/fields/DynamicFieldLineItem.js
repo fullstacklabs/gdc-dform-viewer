@@ -1,8 +1,8 @@
 import React, { useMemo, useCallback } from 'react'
 import PropTypes from 'prop-types'
-import FieldsList from './FieldsList';
+import FieldsList from './FieldsList'
 
-const allowedTypes = ['text', 'number', 'select', 'date'];
+const allowedTypes = ['text', 'number', 'select', 'date']
 
 export const DynamicFieldLineItem = ({
   index,
@@ -26,26 +26,27 @@ export const DynamicFieldLineItem = ({
   renderSignatureField,
   renderTotalizerField,
   renderListItem,
-  allFormFieldsFlatten,
+  allFormFieldsFlatten
 }) => {
   const fields = useMemo(
-    () => templateFields
-      .filter((field) => {
-        if (field.fieldType === 'select') {
-          return !field.subforms?.length;
-        }
-        return allowedTypes.includes(field.fieldType);
-      })
-      .map((templateField) => ({
-        ...templateField,
-        id: `${fieldId}.${index}.FS${templateField.id}`,
-      })),
-    [index],
-  );
+    () =>
+      templateFields
+        .filter((field) => {
+          if (field.fieldType === 'select') {
+            return !field.subforms?.length
+          }
+          return allowedTypes.includes(field.fieldType)
+        })
+        .map((templateField) => ({
+          ...templateField,
+          id: `${fieldId}.${index}.FS${templateField.id}`
+        })),
+    [index]
+  )
 
   const removeItem = useCallback(() => {
-    formikRemove(index);
-  }, [index]);
+    formikRemove(index)
+  }, [index])
 
   return renderListItem({
     removeItem,
@@ -73,9 +74,9 @@ export const DynamicFieldLineItem = ({
         isDynamicListItem
         index={index}
       />
-    ),
-  });
-};
+    )
+  })
+}
 
 DynamicFieldLineItem.propTypes = {
   index: PropTypes.number.isRequired,
@@ -84,5 +85,5 @@ DynamicFieldLineItem.propTypes = {
   addItem: PropTypes.func.isRequired,
   // allFormFields: PropTypes.array.isRequired,
   // allFormikValues: PropTypes.object.isRequired,
-  formikRemove: PropTypes.func.isRequired,
-};
+  formikRemove: PropTypes.func.isRequired
+}

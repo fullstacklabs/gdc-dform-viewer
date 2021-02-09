@@ -1,14 +1,14 @@
-import React, { useEffect, useState, useMemo } from 'react';
-import PropTypes from 'prop-types';
-import { useFormik, FormikProvider } from 'formik';
-import { sectionSchema } from './schema/sectionSchema';
-import FieldsList from './fields/FieldsList';
+import React, { useEffect, useState, useMemo } from 'react'
+import PropTypes from 'prop-types'
+import { useFormik, FormikProvider } from 'formik'
+import { sectionSchema } from './schema/sectionSchema'
+import FieldsList from './fields/FieldsList'
 
 import {
   mapAnswersToFormValues,
   mapFormValuesToAnswers,
-  flattenFormFields,
-} from './helpers/formMapper';
+  flattenFormFields
+} from './helpers/formMapper'
 
 const DForm = ({
   initialSectionIndex,
@@ -26,60 +26,61 @@ const DForm = ({
   renderSignatureField,
   renderTotalizerField,
   renderDynamicListField,
-  renderListItem,
+  renderListItem
 }) => {
   // const dispatch = useDispatch();
-  const [currentSectionIndex, setCurrentSectionIndex] = useState(initialSectionIndex);
+  const [currentSectionIndex, setCurrentSectionIndex] = useState(
+    initialSectionIndex
+  )
 
   useEffect(() => {
     if (currentSectionIndex !== initialSectionIndex) {
-      setCurrentSectionIndex(initialSectionIndex);
+      setCurrentSectionIndex(initialSectionIndex)
     }
-  }, [initialSectionIndex]);
+  }, [initialSectionIndex])
 
-  const allFormFieldsFlatten = useMemo(() => flattenFormFields(form), []);
+  const allFormFieldsFlatten = useMemo(() => flattenFormFields(form), [])
   const orderedSections = useMemo(
     () => form.sections.slice().sort((a, b) => a.order - b.order),
-    [form.sections],
-  );
+    [form.sections]
+  )
 
-  const section = orderedSections[currentSectionIndex];
+  const section = orderedSections[currentSectionIndex]
   const sortedSectionFields = useMemo(
     () => section.fields.slice().sort((a, b) => a.order - b.order),
-    [section.fields],
-  );
+    [section.fields]
+  )
 
-  const [formikValues, setFormikValues] = useState({});
-  const [formikTouched, setFormikTouched] = useState({});
+  const [formikValues, setFormikValues] = useState({})
+  const [formikTouched, setFormikTouched] = useState({})
 
   const initialValues = useMemo(
     () => mapAnswersToFormValues(section.fields, answers, formikValues),
-    [section],
-  );
+    [section]
+  )
 
-  const validationSchema = useMemo(
-    () => sectionSchema(section.fields),
-    [section.fields],
-  );
+  const validationSchema = useMemo(() => sectionSchema(section.fields), [
+    section.fields
+  ])
 
   const formik = useFormik({
     initialValues,
     enableReinitialize: true,
     validationSchema,
     validateOnMount: true,
-    validateOnChange: true,
-  });
+    validateOnChange: true
+  })
 
   useEffect(() => {
     setFormikValues({
       ...formikValues,
-      ...formik.values,
-    });
+      ...formik.values
+    })
     setFormikTouched({
       ...formikTouched,
-      ...formik.touched,
-    });
-  }, [formik.values, formik.touched]);
+      ...formik.touched
+    })
+  }, [formik.values, formik.touched])
 
   const {
     isValid,
@@ -87,16 +88,16 @@ const DForm = ({
     setFieldValue,
     handleBlur,
     values,
-    errors,
-  } = formik;
+    errors
+  } = formik
 
   const moveToNextSection = () => {
-    setCurrentSectionIndex(currentSectionIndex + 1);
-  };
+    setCurrentSectionIndex(currentSectionIndex + 1)
+  }
 
   const moveToPrevSection = () => {
-    setCurrentSectionIndex(currentSectionIndex - 1);
-  };
+    setCurrentSectionIndex(currentSectionIndex - 1)
+  }
 
   const renderFields = () => (
     <FormikProvider value={formik}>
@@ -122,50 +123,61 @@ const DForm = ({
         renderListItem={renderListItem}
       />
     </FormikProvider>
-  );
+  )
 
   const submit = () => {
     const updatedAnswers = mapFormValuesToAnswers(
       formikValues,
       formikTouched,
       answers,
-      allFormFieldsFlatten,
-    );
-    onSubmit(updatedAnswers);
-  };
+      allFormFieldsFlatten
+    )
+    onSubmit(updatedAnswers)
+  }
 
   return renderSection({
     renderFields,
     section,
-    moveToNextSection: currentSectionIndex < form.sections.length - 1 ? moveToNextSection : null,
+    moveToNextSection:
+      currentSectionIndex < form.sections.length - 1 ? moveToNextSection : null,
     moveToPrevSection: currentSectionIndex > 0 ? moveToPrevSection : null,
     isValid,
-    submit,
-  });
-};
+    submit
+  })
+}
 
-export default DForm;
+export default DForm
 
 DForm.defaultProps = {
   initialSectionIndex: 0,
-  answers: [],
-};
+  answers: []
+}
 
 DForm.propTypes = {
   initialSectionIndex: PropTypes.number,
   form: PropTypes.shape({
-    sections: PropTypes.arrayOf(PropTypes.shape({
-      order: PropTypes.number.isRequired,
-      fields: PropTypes.arrayOf(PropTypes.shape({
-        id: PropTypes.number.isRequired,
-        title: PropTypes.string.isRequired,
-      })),
-    })),
+    sections: PropTypes.arrayOf(
+      PropTypes.shape({
+        order: PropTypes.number.isRequired,
+        fields: PropTypes.arrayOf(
+          PropTypes.shape({
+            id: PropTypes.number.isRequired,
+            title: PropTypes.string.isRequired
+          })
+        )
+      })
+    )
   }).isRequired,
-  answers: PropTypes.arrayOf(PropTypes.shape({
-    id: PropTypes.number,
-    fieldId: PropTypes.number,
-    value: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.object]),
-  })).isRequired,
-  onSubmit: PropTypes.func.isRequired,
-};
+  answers: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.number,
+      fieldId: PropTypes.number,
+      value: PropTypes.oneOfType([
+        PropTypes.string,
+        PropTypes.number,
+        PropTypes.object
+      ])
+    })
+  ).isRequired,
+  onSubmit: PropTypes.func.isRequired
+}

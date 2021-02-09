@@ -1,20 +1,20 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react'
 // import { useSelector } from 'react-redux';
 
 export default function useImageStore({
   field,
   value,
   setFieldValue,
-  setFieldTouched,
+  setFieldTouched
   // handleBlur,
 }) {
-  const [initialValue] = useState(value);
-  const [imageSource, setImageSource] = useState(initialValue);
+  const [initialValue] = useState(value)
+  const [imageSource, setImageSource] = useState(initialValue)
   useEffect(() => {
     if (value !== imageSource) {
-      setImageSource(value);
+      setImageSource(value)
     }
-  }, [value]);
+  }, [value])
   // const imagesUploadStatus = useSelector(
   //   ({ formFile }) => formFile.imagesUploadStatus[field.id],
   // );
@@ -33,33 +33,33 @@ export default function useImageStore({
   //   }
   // }, [imagesUploadStatus]);
 
-  const onSave = async data => {
+  const onSave = async (data) => {
     // handleBlur(field.id);
     const imageData = {
       ...data,
       uploaded: false,
       stored: false,
-      fieldType: field.fieldType,
-    };
-    setFieldTouched(field.id, true);
-    setFieldValue(field.id, imageData);
-    setImageSource(imageData);
-  };
+      fieldType: field.fieldType
+    }
+    setFieldTouched(field.id, true)
+    setFieldValue(field.id, imageData)
+    setImageSource(imageData)
+  }
 
   const onClear = () => {
     if (initialValue) {
-      setFieldTouched(field.id, true, false);
+      setFieldTouched(field.id, true, false)
     }
 
-    setImageSource(null);
-    setFieldValue(field.id, null);
-  };
+    setImageSource(null)
+    setFieldValue(field.id, null)
+  }
 
   const onUndo = () => {
-    setFieldTouched(field.id, false, false);
-    setImageSource(initialValue);
-    setFieldValue(field.id, initialValue);
-  };
+    setFieldTouched(field.id, false, false)
+    setImageSource(initialValue)
+    setFieldValue(field.id, initialValue)
+  }
 
   return {
     onSave,
@@ -67,8 +67,8 @@ export default function useImageStore({
     onUndo,
     imageSource,
     canUndo: initialValue && initialValue.stored,
-    canClear: !!imageSource,
+    canClear: !!imageSource
     // errorUploading:
     // !!imagesUploadStatus && imagesUploadStatus.status === 'error',
-  };
+  }
 }

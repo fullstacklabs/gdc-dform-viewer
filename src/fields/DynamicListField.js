@@ -1,8 +1,8 @@
-import React, { useMemo } from 'react';
-import PropTypes from 'prop-types';
-import { FieldArray } from 'formik';
-import { sort } from 'rambdax';
-import DynamicListFieldBody from './DynamicListFieldBody';
+import React, { useMemo } from 'react'
+import PropTypes from 'prop-types'
+import { FieldArray } from 'formik'
+import { sort } from 'rambdax'
+import DynamicListFieldBody from './DynamicListFieldBody'
 
 const DynamicListField = ({
   setFieldTouched,
@@ -24,47 +24,45 @@ const DynamicListField = ({
   renderSignatureField,
   renderTotalizerField,
   renderListItem,
-  allFormFieldsFlatten,
+  allFormFieldsFlatten
 }) => {
   const sortedTemplateFields = useMemo(
     () => sort((a, b) => a.order - b.order, field.templateFields),
-    [],
-  );
+    []
+  )
 
   return (
     <FieldArray
       name={field.id}
-      render={
-        (arrayHelpers) => (
-          <DynamicListFieldBody
-            field={field}
-            templateFields={sortedTemplateFields}
-            value={value}
-            values={values}
-            errors={errors}
-            formikValues={formikValues}
-            setFieldValue={setFieldValue}
-            setFieldTouched={setFieldTouched}
-            handleBlur={handleBlur}
-            renderTextField={renderTextField}
-            renderNumberField={renderNumberField}
-            renderDateField={renderDateField}
-            renderImageField={renderImageField}
-            renderCodeField={renderCodeField}
-            renderGPSField={renderGPSField}
-            renderSelectField={renderSelectField}
-            renderSignatureField={renderSignatureField}
-            renderTotalizerField={renderTotalizerField}
-            allFormFieldsFlatten={allFormFieldsFlatten}
-            render={render}
-            renderListItem={renderListItem}
-            arrayHelpers={arrayHelpers}
-          />
-        )
-      }
+      render={(arrayHelpers) => (
+        <DynamicListFieldBody
+          field={field}
+          templateFields={sortedTemplateFields}
+          value={value}
+          values={values}
+          errors={errors}
+          formikValues={formikValues}
+          setFieldValue={setFieldValue}
+          setFieldTouched={setFieldTouched}
+          handleBlur={handleBlur}
+          renderTextField={renderTextField}
+          renderNumberField={renderNumberField}
+          renderDateField={renderDateField}
+          renderImageField={renderImageField}
+          renderCodeField={renderCodeField}
+          renderGPSField={renderGPSField}
+          renderSelectField={renderSelectField}
+          renderSignatureField={renderSignatureField}
+          renderTotalizerField={renderTotalizerField}
+          allFormFieldsFlatten={allFormFieldsFlatten}
+          render={render}
+          renderListItem={renderListItem}
+          arrayHelpers={arrayHelpers}
+        />
+      )}
     />
-  );
-};
+  )
+}
 
 DynamicListField.propTypes = {
   render: PropTypes.func.isRequired,
@@ -86,7 +84,7 @@ DynamicListField.propTypes = {
   errors: PropTypes.object.isRequired,
   formikValues: PropTypes.object,
   field: PropTypes.object.isRequired,
-  allFormFieldsFlatten: PropTypes.array.isRequired,
-};
+  allFormFieldsFlatten: PropTypes.array.isRequired
+}
 
-export default DynamicListField;
+export default DynamicListField

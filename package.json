@@ -21,7 +21,8 @@
     "test:unit": "cross-env CI=1 react-scripts test --env=jest-environment-jsdom-sixteen",
     "test:watch": "react-scripts test --env=jsdom",
     "predeploy": "cd example && npm install && npm run build",
-    "deploy": "gh-pages -d example/build"
+    "deploy": "gh-pages -d example/build",
+    "format": "prettier --write \"**/*.(js|jsx)\""
   },
   "peerDependencies": {
     "date-fns": "^2.0.0",

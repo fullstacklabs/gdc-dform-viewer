@@ -1,7 +1,7 @@
-import React, { useCallback } from 'react';
-import PropTypes from 'prop-types';
-import { isNil } from 'rambdax';
-import { DynamicFieldLineItem } from './DynamicFieldLineItem';
+import React, { useCallback } from 'react'
+import PropTypes from 'prop-types'
+import { isNil } from 'rambdax'
+import { DynamicFieldLineItem } from './DynamicFieldLineItem'
 
 const DynamicListFieldBody = ({
   setFieldTouched,
@@ -25,7 +25,7 @@ const DynamicListFieldBody = ({
   renderListItem,
   allFormFieldsFlatten,
   arrayHelpers,
-  templateFields,
+  templateFields
 }) => {
   const addItem = useCallback((index) => {
     const lineItemValuesObject = templateFields.reduce(
@@ -34,15 +34,15 @@ const DynamicListFieldBody = ({
         ...acc,
         [`FS${templateField.id}`]: isNil(templateField.schema.defaultValue)
           ? undefined
-          : templateField.schema.defaultValue,
+          : templateField.schema.defaultValue
       }),
-      {},
-    );
-    arrayHelpers.insert(index, lineItemValuesObject);
-  }, []);
+      {}
+    )
+    arrayHelpers.insert(index, lineItemValuesObject)
+  }, [])
 
   const renderFields = useCallback(
-    () => (
+    () =>
       values[field.id].map((lineItem, index) => (
         <DynamicFieldLineItem
           key={lineItem._key}
@@ -69,21 +69,23 @@ const DynamicListFieldBody = ({
           formikRemove={arrayHelpers.remove}
           addItem={addItem}
         />
-      ))
-    ),
-    [values[field.id], errors[field.id]],
-  );
+      )),
+    [values[field.id], errors[field.id]]
+  )
 
   return render({
-    value, field, renderFields, addItem,
-  });
-};
+    value,
+    field,
+    renderFields,
+    addItem
+  })
+}
 
 DynamicListFieldBody.propTypes = {
   render: PropTypes.func.isRequired,
   setFieldValue: PropTypes.func.isRequired,
   setFieldTouched: PropTypes.func.isRequired,
-  error: PropTypes.string,
-};
+  error: PropTypes.string
+}
 
-export default DynamicListFieldBody;
+export default DynamicListFieldBody

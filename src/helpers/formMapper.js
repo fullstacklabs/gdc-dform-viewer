@@ -1,54 +1,50 @@
-import {
-  flatten, is, isNil, omit,
-} from 'rambdax';
-import moment from 'moment';
+import { flatten, is, isNil, omit } from 'rambdax'
+import moment from 'moment'
 
-const ImagesTypeFields = ['image', 'signature'];
+const ImagesTypeFields = ['image', 'signature']
 
-export const flattenFields = fields => (
+export const flattenFields = (fields) =>
   fields.reduce((acc, field) => {
     if (field.subforms && field.subforms.length) {
       const subformFields = flatten(
-        field.subforms.map(subform => subform.fields),
-      );
-      return [...acc, ...subformFields, field];
+        field.subforms.map((subform) => subform.fields)
+      )
+      return [...acc, ...subformFields, field]
     }
-    return [...acc, field];
+    return [...acc, field]
   }, [])
-);
 
-export const flattenFormFields = form => (
-  flatten(form.sections.map(section => flattenFields(section.fields)))
-);
+export const flattenFormFields = (form) =>
+  flatten(form.sections.map((section) => flattenFields(section.fields)))
 
 const formatDateValueToFormValue = (field, value) => {
-  if (!value) return value;
+  if (!value) return value
   switch (field.schema.format) {
     case 'date':
-      return moment(value).format('YYYY-MM-DD');
+      return moment(value).format('YYYY-MM-DD')
     default:
-      return value;
+      return value
   }
-};
+}
 
 export const mapFieldAnswersToFormValues = (field, answers, formValues) => {
   if (formValues[field.id]) {
-    return formValues[field.id];
+    return formValues[field.id]
   }
 
-  if (field.fieldType === 'totalizer') return null;
-  const storedAnswers = answers.filter(x => +x.fieldId === +field.id);
+  if (field.fieldType === 'totalizer') return null
+  const storedAnswers = answers.filter((x) => +x.fieldId === +field.id)
   if (field.fieldType === 'select' && field.schema.multiple) {
-    return storedAnswers.map(answer => answer.value);
+    return storedAnswers.map((answer) => answer.value)
   }
 
-  const storedAnswer = storedAnswers[0];
+  const storedAnswer = storedAnswers[0]
 
   if (field.fieldType === 'dynamicList') {
     if (!storedAnswer) {
-      return [];
+      return []
     }
-    return storedAnswer.value.map((lineItems, index) => (
+    return storedAnswer.value.map((lineItems, index) =>
       field.templateFields.reduce(
         (acc, templateField) => ({
           _key: index,
@@ -56,74 +52,74 @@ export const mapFieldAnswersToFormValues = (field, answers, formValues) => {
           [`FS${templateField.id}`]: mapFieldAnswersToFormValues(
             templateField,
             lineItems.answers,
-            formValues,
-          ),
+            formValues
+          )
         }),
-        {},
+        {}
       )
-    ));
+    )
   }
 
   if (ImagesTypeFields.includes(field.fieldType)) {
-    if (!storedAnswer) return null;
+    if (!storedAnswer) return null
     return {
       fieldType: field.fieldType,
       uri: storedAnswer.value,
       uploaded: true,
-      stored: true,
-    };
+      stored: true
+    }
   }
 
-  let defaultV = field.schema?.defaultValue || undefined;
+  let defaultV = field.schema?.defaultValue || undefined
 
-  defaultV = storedAnswer ? storedAnswer.value : defaultV;
-  const fieldAnswer = answers.find(answer => +answer.fieldId === +field.id);
-  defaultV = (fieldAnswer && fieldAnswer.value) || defaultV;
+  defaultV = storedAnswer ? storedAnswer.value : defaultV
+  const fieldAnswer = answers.find((answer) => +answer.fieldId === +field.id)
+  defaultV = (fieldAnswer && fieldAnswer.value) || defaultV
   if (field.fieldType === 'date') {
-    defaultV = formatDateValueToFormValue(field, defaultV);
+    defaultV = formatDateValueToFormValue(field, defaultV)
   }
-  return defaultV;
-};
+  return defaultV
+}
 
 export const mapAnswersToFormValues = (fields, answers, formValues) => {
-  const initialValuesAux = {};
-  flattenFields(fields || []).forEach(field => {
+  const initialValuesAux = {}
+  flattenFields(fields || []).forEach((field) => {
     initialValuesAux[field.id] = mapFieldAnswersToFormValues(
       field,
       answers,
-      formValues,
-    );
-  });
+      formValues
+    )
+  })
 
-  return initialValuesAux;
-};
+  return initialValuesAux
+}
 
 const mapFormValueToAnswer = (fieldId, fields, value, touched, answers) => {
-  const intFieldId = +fieldId;
+  const intFieldId = +fieldId
   if (isNil(value)) {
-    return [];
+    return []
   }
 
-  const field = fields.find(f => f.id === intFieldId);
+  const field = fields.find((f) => f.id === intFieldId)
   /*
     field.fieldType !== 'dynamicList': when item is removed and there are no changes on other line item
     touched is undefined.
   */
   if (!touched && field.fieldType !== 'dynamicList') {
     const untouchedAnswers = answers.filter(
-      answer => answer.fieldId === intFieldId,
-    );
-    return untouchedAnswers.map(untouchedAnswer => ({
+      (answer) => answer.fieldId === intFieldId
+    )
+    return untouchedAnswers.map((untouchedAnswer) => ({
       id: +untouchedAnswer.id,
-      fieldId: intFieldId,
-    }));
+      fieldId: intFieldId
+    }))
   }
 
   if (Array.isArray(value)) {
     if (field.fieldType === 'dynamicList') {
       const dynamicFieldAnswer = answers.find(
-        answer => answer.fieldId === intFieldId,
-      );
+        (answer) => answer.fieldId === intFieldId
+      )
 
       const mappedValue = value.map((formikListItem, index) => ({
         order: index + 1,
@@ -134,16 +130,16 @@ const mapFormValueToAnswer = (fieldId, fields, value, touched, answers) => {
               field.templateFields,
               formikListItem[listItemfieldId],
               true, // touched[index][listItemfieldId],
-              dynamicFieldAnswer?.value[index]?.answers,
-            );
-            return [...acc, ...values];
+              dynamicFieldAnswer?.value[index]?.answers
+            )
+            return [...acc, ...values]
           },
-          [],
-        ),
-      }));
-      return [{ fieldId: intFieldId, value: mappedValue }];
+          []
+        )
+      }))
+      return [{ fieldId: intFieldId, value: mappedValue }]
     }
-    return value.map(op => ({ fieldId: intFieldId, value: op }));
+    return value.map((op) => ({ fieldId: intFieldId, value: op }))
   }
 
   if (is(Object, value)) {
@@ -151,25 +147,25 @@ const mapFormValueToAnswer = (fieldId, fields, value, touched, answers) => {
       return [
         {
           fieldId: intFieldId,
-          value: { x: value.x, y: value.y },
-        },
-      ];
+          value: { x: value.x, y: value.y }
+        }
+      ]
     }
 
     if (ImagesTypeFields.includes(value.fieldType)) {
-      return [{ fieldId: intFieldId, value }];
+      return [{ fieldId: intFieldId, value }]
     }
-    return [];
+    return []
   }
 
-  return [{ fieldId: intFieldId, value }];
-};
+  return [{ fieldId: intFieldId, value }]
+}
 
 export const mapFormValuesToAnswers = (
   formikvalues,
   touchedValues,
   answers,
-  fields,
+  fields
 ) => {
   const updatedAnswers = Object.keys(formikvalues).reduce((acc, fieldId) => {
     const newAnswers = mapFormValueToAnswer(
@@ -177,10 +173,10 @@ export const mapFormValuesToAnswers = (
       fields,
       formikvalues[fieldId],
       touchedValues[fieldId],
-      answers,
-    );
-    return [...acc, ...newAnswers];
-  }, []);
+      answers
+    )
+    return [...acc, ...newAnswers]
+  }, [])
 
-  return updatedAnswers;
-};
+  return updatedAnswers
+}

@@ -1,25 +1,25 @@
-import { flatten } from 'rambdax';
+import { flatten } from 'rambdax'
 
-export const formatDate = date => {
-  const d = new Date(date);
-  let month = `${d.getMonth() + 1}`;
-  let day = `${d.getDate()}`;
-  const year = d.getFullYear();
+export const formatDate = (date) => {
+  const d = new Date(date)
+  let month = `${d.getMonth() + 1}`
+  let day = `${d.getDate()}`
+  const year = d.getFullYear()
 
-  if (month.length < 2) month = `0${month}`;
-  if (day.length < 2) day = `0${day}`;
+  if (month.length < 2) month = `0${month}`
+  if (day.length < 2) day = `0${day}`
 
-  return [day, month, year].join('-');
-};
+  return [day, month, year].join('-')
+}
 
-export const formatStringDate = date => {
+export const formatStringDate = (date) => {
   if (date) {
-    return date.split('T')[0];
+    return date.split('T')[0]
   }
-  return null;
-};
+  return null
+}
 
-export const getTextByKey = key => {
+export const getTextByKey = (key) => {
   const attributes = {
     technical: 'Técnico',
     manager: 'Manager',
@@ -57,10 +57,10 @@ export const getTextByKey = key => {
     lastName: 'Apellido',
     type: 'Tipo de Orden',
     startDate: 'Fecha de Ejecución Inicio',
-    endDate: 'Fecha de Ejecución Fin',
-  };
-  return attributes[key];
-};
+    endDate: 'Fecha de Ejecución Fin'
+  }
+  return attributes[key]
+}
 
 const schemas = {
   user: [
@@ -72,7 +72,7 @@ const schemas = {
     'state',
     'password',
     'scopes',
-    'profiles',
+    'profiles'
   ],
   userToEdit: [
     'firstName',
@@ -82,7 +82,7 @@ const schemas = {
     'state',
     'password',
     'profiles',
-    'scopes',
+    'scopes'
   ],
   orderTypes: ['typeName', 'orderColor', 'description'],
   orders: [
@@ -93,7 +93,7 @@ const schemas = {
     'priority',
     'managerId',
     'technicalId',
-    'executionDate',
+    'executionDate'
   ],
   orderToEdit: [
     'address',
@@ -102,28 +102,28 @@ const schemas = {
     'priority',
     'managerId',
     'technicalId',
-    'executionDate',
-  ],
-};
+    'executionDate'
+  ]
+}
 
 export const getObjectBySchema = (oldObj, newObj, schema) => {
-  const attr = {};
-  schemas[schema].forEach(key => {
+  const attr = {}
+  schemas[schema].forEach((key) => {
     if (oldObj[key] !== newObj[key]) {
-      attr[key] = newObj[key] || null;
+      attr[key] = newObj[key] || null
     }
-  });
-  return attr;
-};
+  })
+  return attr
+}
 
-export const flattenFields = fields => {
+export const flattenFields = (fields) => {
   return fields.reduce((acc, field) => {
     if (field.subforms && field.subforms.length) {
       const subformFields = flatten(
-        field.subforms.map(subform => subform.fields),
-      );
-      return [...acc, ...subformFields, field];
+        field.subforms.map((subform) => subform.fields)
+      )
+      return [...acc, ...subformFields, field]
     }
-    return [...acc, field];
-  }, []);
-};
+    return [...acc, field]
+  }, [])
+}
