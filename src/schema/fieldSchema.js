@@ -1,12 +1,13 @@
-import { fieldTextSchema } from './fieldTextSchema'
-import { fieldSelectSchema } from './fieldSelectSchema'
-import { fieldDateSchema } from './fieldDateSchema'
-import { fieldImageSchema } from './fieldImageSchema'
-import { fieldNumberSchema } from './fieldNumberSchema'
-import { fieldCodeSchema } from './fieldCodeSchema'
-import { fieldSignatureSchema } from './fieldSignatureSchema'
-import { filedGPSSchema } from './filedGPSSchema'
-import { dynamicListFieldSchema } from './dynamicListFieldSchema'
+import * as Yup from 'yup'
+import { fieldTextSchema } from './fieldTextSchema';
+import { fieldSelectSchema } from './fieldSelectSchema';
+import { fieldDateSchema } from './fieldDateSchema';
+import { fieldImageSchema } from './fieldImageSchema';
+import { fieldNumberSchema } from './fieldNumberSchema';
+import { fieldCodeSchema } from './fieldCodeSchema';
+import { fieldSignatureSchema } from './fieldSignatureSchema';
+import { filedGPSSchema } from './filedGPSSchema';
+import { dynamicListFieldSchema } from './dynamicListFieldSchema';
 
 export const fieldSchema = (field) => {
   switch (field.fieldType) {
@@ -35,6 +36,6 @@ export const fieldSchema = (field) => {
     case 'dynamicList':
       return dynamicListFieldSchema(field)
     default:
-      return {}
+      return { schema: Yup.object().shape({}).noUnknown() };
   }
 }
