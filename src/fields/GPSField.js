@@ -1,5 +1,5 @@
 // import React from 'react';
-import PropTypes from 'prop-types';
+import PropTypes from 'prop-types'
 
 const GPSField = ({
   setFieldTouched,
@@ -7,24 +7,24 @@ const GPSField = ({
   value,
   error,
   render,
-  field,
+  field
 }) => {
   const onFieldChange = ({ x, y }) => {
-    setFieldTouched(field.id, true);
+    setFieldTouched(field.id, true)
     setFieldValue(field.id, {
       fieldType: field.fieldType,
       x,
-      y,
-    });
-  };
+      y
+    })
+  }
 
   return render({
     field,
     value,
     error,
-    onFieldChange,
-  });
-};
+    onFieldChange
+  })
+}
 
 GPSField.propTypes = {
   render: PropTypes.func.isRequired,
@@ -32,9 +32,9 @@ GPSField.propTypes = {
   setFieldTouched: PropTypes.func.isRequired,
   value: PropTypes.shape({
     x: PropTypes.number.isRequired,
-    y: PropTypes.number.isRequired,
+    y: PropTypes.number.isRequired
   }),
-  error: PropTypes.string,
-};
+  error: PropTypes.string
+}
 
-export default GPSField;
+export default GPSField

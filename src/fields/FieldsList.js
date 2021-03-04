@@ -1,15 +1,15 @@
-import React from 'react';
-import { getIn } from 'formik';
-import TextField from './TextField';
-import NumberField from './NumberField';
-import CodeField from './CodeField';
-import GPSField from './GPSField';
-import ImageField from './ImageField';
-import SignatureField from './SignatureField';
-import DateField from './DateField';
-import TotalizerField from './TotalizerField';
-import SelectField from './SelectField';
-import DynamicListField from './DynamicListField';
+import React from 'react'
+import { getIn } from 'formik'
+import TextField from './TextField'
+import NumberField from './NumberField'
+import CodeField from './CodeField'
+import GPSField from './GPSField'
+import ImageField from './ImageField'
+import SignatureField from './SignatureField'
+import DateField from './DateField'
+import TotalizerField from './TotalizerField'
+import SelectField from './SelectField'
+import DynamicListField from './DynamicListField'
 
 const FieldsList = ({
   fields,
@@ -33,11 +33,11 @@ const FieldsList = ({
   allFormFieldsFlatten,
   isDynamicListItem,
   removeItem,
-  index,
-}) => (
-  fields.map(field => {
-    const value = getIn(values, field.id) || getIn(formikValues[field.id]);
-    const error = getIn(errors, field.id);
+  index
+}) =>
+  fields.map((field) => {
+    const value = getIn(values, field.id) || getIn(formikValues[field.id])
+    const error = getIn(errors, field.id)
     if (field.fieldType === 'text') {
       return (
         <TextField
@@ -52,7 +52,7 @@ const FieldsList = ({
           removeItem={removeItem}
           index={index}
         />
-      );
+      )
     }
     if (field.fieldType === 'number') {
       return (
@@ -69,7 +69,7 @@ const FieldsList = ({
           removeItem={removeItem}
           index={index}
         />
-      );
+      )
     }
     if (field.fieldType === 'code') {
       return (
@@ -82,7 +82,7 @@ const FieldsList = ({
           setFieldValue={setFieldValue}
           render={renderCodeField}
         />
-      );
+      )
     }
     if (field.fieldType === 'gps') {
       return (
@@ -95,7 +95,7 @@ const FieldsList = ({
           setFieldValue={setFieldValue}
           render={renderGPSField}
         />
-      );
+      )
     }
     if (field.fieldType === 'date') {
       return (
@@ -111,7 +111,7 @@ const FieldsList = ({
           removeItem={removeItem}
           index={index}
         />
-      );
+      )
     }
     if (field.fieldType === 'select') {
       return (
@@ -141,7 +141,7 @@ const FieldsList = ({
           removeItem={removeItem}
           index={index}
         />
-      );
+      )
     }
     if (field.fieldType === 'image') {
       return (
@@ -158,7 +158,7 @@ const FieldsList = ({
           removeItem={removeItem}
           index={index}
         />
-      );
+      )
     }
     if (field.fieldType === 'signature') {
       return (
@@ -171,7 +171,7 @@ const FieldsList = ({
           setFieldValue={setFieldValue}
           render={renderSignatureField}
         />
-      );
+      )
     }
 
     if (field.fieldType === 'totalizer') {
@@ -183,7 +183,7 @@ const FieldsList = ({
           allFormFields={allFormFieldsFlatten}
           allFormValues={values}
         />
-      );
+      )
     }
 
     if (field.fieldType === 'dynamicList') {
@@ -212,11 +212,10 @@ const FieldsList = ({
           allFormFieldsFlatten={allFormFieldsFlatten}
           renderListItem={renderListItem}
         />
-      );
+      )
     }
 
-    return null;
+    return null
   })
-);
 
-export default FieldsList;
+export default FieldsList

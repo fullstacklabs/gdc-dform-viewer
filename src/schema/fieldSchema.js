@@ -11,30 +11,30 @@ import { dynamicListFieldSchema } from './dynamicListFieldSchema'
 export const fieldSchema = (field) => {
   switch (field.fieldType) {
     case 'text':
-      return fieldTextSchema(field);
+      return fieldTextSchema(field)
     // SELECT VALIDATION
     case 'select':
-      return fieldSelectSchema(field);
+      return fieldSelectSchema(field)
     // Date Validation
     case 'date':
-      return fieldDateSchema(field);
+      return fieldDateSchema(field)
 
     // IMAGE VALIDATION
     case 'image':
-      return fieldImageSchema(field);
+      return fieldImageSchema(field)
 
     // NUMBER VALIDATION
     case 'number':
-      return fieldNumberSchema(field);
+      return fieldNumberSchema(field)
     case 'code':
-      return fieldCodeSchema(field);
+      return fieldCodeSchema(field)
     case 'signature':
-      return fieldSignatureSchema(field);
+      return fieldSignatureSchema(field)
     case 'gps':
-      return filedGPSSchema(field);
+      return filedGPSSchema(field)
     case 'dynamicList':
-      return dynamicListFieldSchema(field);
+      return dynamicListFieldSchema(field)
     default:
-      return {};
+      return {}
   }
-};
+}

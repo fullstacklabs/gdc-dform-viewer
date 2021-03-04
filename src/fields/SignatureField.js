@@ -1,13 +1,13 @@
 // import React from 'react';
-import PropTypes from 'prop-types';
-import useImageStore from './useImageStore';
+import PropTypes from 'prop-types'
+import useImageStore from './useImageStore'
 
 const SignatureField = ({
   setFieldTouched,
   setFieldValue,
   value,
   render,
-  field,
+  field
 }) => {
   const {
     imageSource,
@@ -16,13 +16,13 @@ const SignatureField = ({
     onSave,
     onUndo,
     onClear,
-    errorUploading,
+    errorUploading
   } = useImageStore({
     field,
     value,
     setFieldValue,
-    setFieldTouched,
-  });
+    setFieldTouched
+  })
 
   return render({
     field,
@@ -33,14 +33,14 @@ const SignatureField = ({
     onSave,
     onUndo,
     onClear,
-    errorUploading,
-  });
-};
+    errorUploading
+  })
+}
 
 SignatureField.propTypes = {
   render: PropTypes.func.isRequired,
   setFieldValue: PropTypes.func.isRequired,
-  setFieldTouched: PropTypes.func.isRequired,
-};
+  setFieldTouched: PropTypes.func.isRequired
+}
 
-export default SignatureField;
+export default SignatureField

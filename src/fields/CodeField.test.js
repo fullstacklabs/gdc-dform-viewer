@@ -1,22 +1,19 @@
 // __tests__/fetch.test.js
-import React from 'react';
-import {
-  render,
-  waitFor,
-  fireEvent,
-  screen,
-} from '@testing-library/react';
-import '@testing-library/jest-dom/extend-expect';
-import DForm from '../DForm';
+import React from 'react'
+import { render, waitFor, fireEvent, screen } from '@testing-library/react'
+import '@testing-library/jest-dom/extend-expect'
+import DForm from '../DForm'
 
 const renderForm = (field) => {
   const form = {
-    sections: [{
-      order: 1,
-      title: 'Sec 1',
-      fields: [field],
-    }],
-  };
+    sections: [
+      {
+        order: 1,
+        title: 'Sec 1',
+        fields: [field]
+      }
+    ]
+  }
 
   render(
     <DForm
@@ -28,23 +25,19 @@ const renderForm = (field) => {
       onSectionNext={() => {}}
       onSubmit={() => {}}
       renderSection={({ renderFields }) => renderFields()}
-      renderCodeField={({
-        onFieldChange,
-        value,
-        error,
-      }) => (
+      renderCodeField={({ onFieldChange, value, error }) => (
         <div>
           <input
-            data-testid="field-input"
-            onChange={e => onFieldChange(e.target.value)}
+            data-testid='field-input'
+            onChange={(e) => onFieldChange(e.target.value)}
             value={value || ''}
           />
-          <div data-testid="field-errors">{error}</div>
+          <div data-testid='field-errors'>{error}</div>
         </div>
       )}
-    />,
-  );
-};
+    />
+  )
+}
 
 test('required validation', async () => {
   const field = {
@@ -53,12 +46,16 @@ test('required validation', async () => {
     fieldType: 'code',
     required: true,
     title: 'field',
-    schema: {},
-  };
-  renderForm(field);
-  await waitFor(() => expect(screen.queryByTestId('field-errors')).toHaveTextContent('*'));
+    schema: {}
+  }
+  renderForm(field)
+  await waitFor(() =>
+    expect(screen.queryByTestId('field-errors')).toHaveTextContent('*')
+  )
   fireEvent.change(screen.queryByTestId('field-input'), {
-    target: { value: 'acodedstring' },
-  });
-  await waitFor(() => expect(screen.queryByTestId('field-errors')).toBeEmptyDOMElement());
-});
+    target: { value: 'acodedstring' }
+  })
+  await waitFor(() =>
+    expect(screen.queryByTestId('field-errors')).toBeEmptyDOMElement()
+  )
+})

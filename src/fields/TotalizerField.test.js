@@ -1,22 +1,19 @@
 // __tests__/fetch.test.js
-import React from 'react';
-import {
-  render,
-  waitFor,
-  fireEvent,
-  screen,
-} from '@testing-library/react';
-import '@testing-library/jest-dom/extend-expect';
-import DForm from '../DForm';
+import React from 'react'
+import { render, waitFor, fireEvent, screen } from '@testing-library/react'
+import '@testing-library/jest-dom/extend-expect'
+import DForm from '../DForm'
 
 const renderForm = (fields) => {
   const form = {
-    sections: [{
-      order: 1,
-      title: 'Sec 1',
-      fields,
-    }],
-  };
+    sections: [
+      {
+        order: 1,
+        title: 'Sec 1',
+        fields
+      }
+    ]
+  }
 
   render(
     <DForm
@@ -28,17 +25,10 @@ const renderForm = (fields) => {
       onSectionNext={() => {}}
       onSubmit={() => {}}
       renderSection={({ renderFields }) => renderFields()}
-      renderTotalizerField={({
-        totalizedValue,
-      }) => (
-        <div data-testid="totalized-value">{totalizedValue}</div>
+      renderTotalizerField={({ totalizedValue }) => (
+        <div data-testid='totalized-value'>{totalizedValue}</div>
       )}
-      renderNumberField={({
-        onFieldChange,
-        error,
-        inputValue,
-        field,
-      }) => (
+      renderNumberField={({ onFieldChange, error, inputValue, field }) => (
         <div>
           <input
             data-testid={`field-input-${field.id}`}
@@ -46,12 +36,12 @@ const renderForm = (fields) => {
             value={inputValue}
             readOnly={field.schema.readOnly}
           />
-          <div data-testid="field-errors">{error}</div>
+          <div data-testid='field-errors'>{error}</div>
         </div>
       )}
-    />,
-  );
-};
+    />
+  )
+}
 
 test('run totalizer function for all section fields', async () => {
   const totalizerField = {
@@ -67,9 +57,9 @@ test('run totalizer function for all section fields', async () => {
         }
 
         return 'No hay resultado aún';
-      `,
-    },
-  };
+      `
+    }
+  }
 
   const t1Field = {
     id: 2,
@@ -77,8 +67,8 @@ test('run totalizer function for all section fields', async () => {
     title: 't1',
     fieldType: 'number',
     referenceId: 'f2',
-    schema: {},
-  };
+    schema: {}
+  }
 
   const t2Field = {
     id: 3,
@@ -86,8 +76,8 @@ test('run totalizer function for all section fields', async () => {
     title: 't2',
     fieldType: 'number',
     referenceId: 'f3',
-    schema: {},
-  };
+    schema: {}
+  }
 
   const tasaField = {
     id: 4,
@@ -97,28 +87,25 @@ test('run totalizer function for all section fields', async () => {
     referenceId: 'tasa',
     schema: {
       defaultValue: 5,
-      readOnly: true,
-    },
-  };
+      readOnly: true
+    }
+  }
 
-  renderForm([
-    totalizerField,
-    t1Field,
-    t2Field,
-    tasaField,
-  ]);
-  await waitFor(
-    () => expect(screen.queryByTestId('totalized-value')).toHaveTextContent('No hay resultado aún'),
-  );
+  renderForm([totalizerField, t1Field, t2Field, tasaField])
+  await waitFor(() =>
+    expect(screen.queryByTestId('totalized-value')).toHaveTextContent(
+      'No hay resultado aún'
+    )
+  )
   fireEvent.change(screen.queryByTestId(`field-input-${t1Field.id}`), {
-    target: { value: '7' },
-  });
+    target: { value: '7' }
+  })
   fireEvent.change(screen.queryByTestId(`field-input-${t2Field.id}`), {
-    target: { value: '3' },
-  });
-  await waitFor(
-    () => expect(
-      screen.queryByTestId('totalized-value'),
-    ).toHaveTextContent('Este es el resultado: 50'),
-  );
-});
+    target: { value: '3' }
+  })
+  await waitFor(() =>
+    expect(screen.queryByTestId('totalized-value')).toHaveTextContent(
+      'Este es el resultado: 50'
+    )
+  )
+})
