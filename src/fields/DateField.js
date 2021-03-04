@@ -1,15 +1,21 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
 import moment from 'moment'
 
-const formatTime = (d) => {
-  if (!d) return null
-  const currentDate = new Date()
-  return typeof d === 'string' && d.length > 3 && d[2] === ':'
-    ? `${currentDate.getFullYear()}-${
-        currentDate.getMonth() + 1
-      }-${currentDate.getDate()} ${d}`
-    : d
+const formatTime = (date) => {
+  if (!date) return null
+
+  if (typeof date === 'string' && date.length > 3 && date[2] === ':') {
+    const currentDate = new Date()
+
+    const year = currentDate.getFullYear()
+    const month = currentDate.getMonth() + 1
+    const day = currentDate.getDate()
+
+    return `${year}-${month}-${day} ${date}`
+  }
+
+  return date
 }
 
 const formatReponse = (field, value) => {
@@ -36,12 +42,15 @@ const DateField = ({
   removeItem,
   index
 }) => {
-  const [inputValue, setInputvalue] = useState(formatTime(value))
+  const [inputValue, setInputvalue] = useState(() => formatTime(value))
+
+  useEffect(() => {
+    setInputvalue(formatTime(value))
+  }, [value])
 
   const onFieldChange = (newValue) => {
     setFieldTouched(field.id, true)
     setFieldValue(field.id, formatReponse(field, newValue))
-    setInputvalue(formatTime(newValue))
   }
 
   return render({

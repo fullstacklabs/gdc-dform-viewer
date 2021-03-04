@@ -17,9 +17,10 @@ export const fieldNumberSchema = (field) => {
         !field.schema.max || !is(Number, value) || value <= field.schema.max
     )
     .label(field.title)
-  if (field.required) {
-    schema = schema.required('*')
-  }
+
+  if (field.schema.format === 'integer') schema = schema.integer()
+
+  if (field.required) schema = schema.required('*')
 
   return { schema }
 }

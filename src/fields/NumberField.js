@@ -1,13 +1,19 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { isNil } from 'rambdax'
 import PropTypes from 'prop-types'
 
 const maxNumber = 99999999999999.98
 
 const parseNumber = (value, format) => {
-  let number = ''
+  if (isNil(value) || Number.isNaN(value)) return ''
+
+  if (typeof value === 'number') return value
+
+  let numberStr = ''
+
   if (format === 'number') {
     if (value.length === 1) return `0.0${value}`
+
     if (value) {
       const reversedNumberWithNoDecimalPoint = value
         .replace(/\.|,/g, '')
@@ -15,7 +21,7 @@ const parseNumber = (value, format) => {
         .reverse()
         .join('')
 
-      number = reversedNumberWithNoDecimalPoint
+      numberStr = reversedNumberWithNoDecimalPoint
         .replace(/^([0-9]{1,2})([0-9]*)$/g, '$1.$2')
         .split('')
         .reverse()
@@ -25,10 +31,13 @@ const parseNumber = (value, format) => {
         .replace(/^\.([0-9]+)$/g, '0.$1')
         .replace(/^([0-9]+)\.0$/g, '$1.00')
     }
-
-    return number
+  } else {
+    numberStr = value.replace(/[^0-9]/g, '')
   }
-  return value.replace(/[^0-9]/g, '')
+
+  const number = Number(numberStr)
+
+  return number
 }
 
 const NumberField = ({
@@ -44,18 +53,23 @@ const NumberField = ({
   index
 }) => {
   const [inputValue, setInputvalue] = useState(() => {
+    if (isNil(value) || Number.isNaN(value)) return ''
+
     if (field.schema.format === 'number') {
-      return isNil(value) ? '' : String(value).replace(/^([0-9]+)$/, '$1.00')
+      return String(value).replace(/^([0-9]+)$/, '$1.00')
     }
 
-    return isNil(value) ? '' : String(value)
+    return String(value)
   })
 
+  useEffect(() => {
+    setInputvalue(parseNumber(value, field.schema.format))
+  }, [value, field.schema.format])
+
   const onFieldChange = (newValue) => {
-    const stringNumber = parseNumber(newValue, field.schema.format)
-    const number = Number(stringNumber)
+    const number = parseNumber(newValue, field.schema.format)
+
     if (number < maxNumber) {
-      setInputvalue(stringNumber)
       setFieldTouched(field.id, true, true)
       setFieldValue(field.id, number === '' ? null : number)
     }
