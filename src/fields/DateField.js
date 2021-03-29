@@ -50,7 +50,10 @@ const DateField = ({
 
   const onFieldChange = (newValue) => {
     setFieldTouched(field.id, true)
-    setFieldValue(field.id, formatReponse(field, newValue))
+    setFieldValue(
+      field.id,
+      newValue == null ? null : formatReponse(field, newValue)
+    )
   }
 
   return render({
