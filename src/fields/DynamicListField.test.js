@@ -189,10 +189,20 @@ test('list required validation', async () => {
         fieldType: 'text',
         title: 'field',
         schema: {
-          defaultValue: '',
-        },
+          defaultValue: ''
+        }
       },
-    ],
+      {
+        id: 3,
+        order: 2,
+        fieldType: 'image',
+        title: 'image',
+        required: false,
+        schema: {
+          max: 100,
+        }
+      }
+    ]
   }
   renderForm(field)
   await waitFor(() =>
