@@ -188,6 +188,16 @@ test('list required validation', async () => {
         schema: {
           defaultValue: ''
         }
+      },
+      {
+        id: 3,
+        order: 2,
+        fieldType: 'image',
+        title: 'image',
+        required: false,
+        schema: {
+          max: 100,
+        }
       }
     ]
   }

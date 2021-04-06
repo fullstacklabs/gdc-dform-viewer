@@ -1,8 +1,16 @@
 import React, { useMemo, useCallback } from 'react'
 import PropTypes from 'prop-types'
 import FieldsList from './FieldsList'
+import * as FieldTypes from './type/FieldType'
 
-const allowedTypes = ['text', 'number', 'select', 'date']
+const allowedTypes = [
+  FieldTypes.TEXT,
+  FieldTypes.NUMBER,
+  FieldTypes.SELECT,
+  FieldTypes.DATE,
+  FieldTypes.SIGNATURE,
+  FieldTypes.IMAGE,
+]
 
 export const DynamicFieldLineItem = ({
   index,
