@@ -81,7 +81,7 @@ export const fieldDateSchema = (field) => {
     }
   }
   if (field.schema.minCurrentDate) {
-    schema = schema.test('is-before', (value) => {
+    schema = schema.test('is-before', function (value) {
       if (value && field.schema.format !== 'date') {
         const currentDate = new Date()
         let text = ''
