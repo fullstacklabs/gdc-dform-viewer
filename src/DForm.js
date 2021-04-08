@@ -126,6 +126,10 @@ const DForm = ({
   )
 
   const submit = () => {
+    console.log(formikValues)
+    console.log(formikTouched)
+    console.log(answers)
+    console.log(allFormFieldsFlatten)
     const updatedAnswers = mapFormValuesToAnswers(
       formikValues,
       formikTouched,
