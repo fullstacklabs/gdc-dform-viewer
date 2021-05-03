@@ -14,15 +14,26 @@ function buildOrderWithReferences(fields, formikValues) {
 }
 
 const TotalizerField = ({ allFormFields, allFormValues, render, field }) => {
-  // eslint-disable-next-line no-new-func
-  const totalizerFuncion = new Function(
-    'order',
-    `try {
+  let totalizerFuncion
+
+  try {
+    // eslint-disable-next-line no-new-func
+    totalizerFuncion = new Function(
+      'order',
+      `try {
       ${field.schema.textFunction};
     } catch (e) {
       return null;
     }`
-  )
+    )
+  } catch {
+    // eslint-disable-next-line no-new-func
+    return render({
+      field,
+      totalizedValue: null,
+      errorDefinition: true
+    })
+  }
 
   const [totalizedValue, setTotalizedValue] = useState(() =>
     totalizerFuncion(buildOrderWithReferences(allFormFields, allFormValues))
@@ -36,7 +47,8 @@ const TotalizerField = ({ allFormFields, allFormValues, render, field }) => {
 
   return render({
     field,
-    totalizedValue
+    totalizedValue,
+    errorDefinition: false
   })
 }
 
