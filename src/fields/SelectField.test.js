@@ -11,9 +11,9 @@ const renderForm = (f) => {
       {
         order: 1,
         title: 'Sec 1',
-        fields: [f]
-      }
-    ]
+        fields: [f],
+      },
+    ],
   }
 
   render(
@@ -60,7 +60,7 @@ const renderForm = (f) => {
         error,
         field,
         renderSubForm,
-        value
+        value,
       }) => (
         <div>
           <select
@@ -98,8 +98,8 @@ test('required validation for single select', async () => {
     title: 'field',
     schema: {
       format: 'singleSelect',
-      options: ['option-a', 'option-b', 'option-c']
-    }
+      options: ['option-a', 'option-b', 'option-c'],
+    },
   }
   renderForm(field)
   await waitFor(() =>
@@ -122,8 +122,8 @@ test('required validation for multiple select', async () => {
     title: 'field',
     schema: {
       format: 'multipleSelect',
-      options: ['option-a', 'option-b', 'option-c']
-    }
+      options: ['option-a', 'option-b', 'option-c'],
+    },
   }
   renderForm(field)
   await waitFor(() =>
@@ -133,7 +133,7 @@ test('required validation for multiple select', async () => {
   )
   userEvent.selectOptions(screen.getByTestId('field-input-1'), [
     'option-a',
-    'option-b'
+    'option-b',
   ])
   await waitFor(() =>
     expect(screen.queryByTestId('field-error-1')).toBeEmptyDOMElement()
@@ -149,7 +149,7 @@ test('subform render and valdiations', async () => {
     title: 'field',
     schema: {
       format: 'singleSelect',
-      options: ['option-a', 'option-b', 'option-c', 'option-d']
+      options: ['option-a', 'option-b', 'option-c', 'option-d'],
     },
     subforms: [
       {
@@ -160,16 +160,16 @@ test('subform render and valdiations', async () => {
             order: 1,
             title: 'sf-field-2',
             fieldType: 'text',
-            schema: {}
+            schema: {},
           },
           {
             id: 3,
             order: 2,
             title: 'sf-field-3',
             fieldType: 'number',
-            schema: {}
-          }
-        ]
+            schema: {},
+          },
+        ],
       },
       {
         options: ['option-b', 'option-d'],
@@ -180,8 +180,8 @@ test('subform render and valdiations', async () => {
             title: 'sf-field-4',
             fieldType: 'select',
             schema: {
-              options: ['sb-option-a', 'sb-option-b']
-            }
+              options: ['sb-option-a', 'sb-option-b'],
+            },
           },
           {
             id: 5,
@@ -189,11 +189,11 @@ test('subform render and valdiations', async () => {
             title: 'sf-field-5',
             fieldType: 'text',
             required: true,
-            schema: {}
-          }
-        ]
-      }
-    ]
+            schema: {},
+          },
+        ],
+      },
+    ],
   }
   renderForm(field)
   await waitFor(() =>

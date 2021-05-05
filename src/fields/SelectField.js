@@ -1,7 +1,8 @@
 import React, { useMemo } from 'react'
 import PropTypes from 'prop-types'
-import { intersection } from 'rambdax'
+import { castArray, intersection } from 'lodash'
 import FieldsList from './FieldsList'
+
 const MultipleTypeFormats = ['multipleSelect', 'checkbox']
 
 const SelectField = ({
@@ -16,7 +17,6 @@ const SelectField = ({
   formikValues,
   renderTextField,
   renderNumberField,
-  handleBlur,
   renderCodeField,
   renderGPSField,
   renderDateField,
@@ -27,16 +27,18 @@ const SelectField = ({
   allFormFieldsFlatten,
   isDynamicListItem,
   removeItem,
-  index
+  index,
 }) => {
-  const onFieldChange = (newValue) => {
-    // eslint-disable-next-line max-len
+  const onFieldChange = (value) => {
+    let newValue = value // selected item(s)
+
     if (
       MultipleTypeFormats.includes(field.schema.format) &&
       !Array.isArray(newValue)
     ) {
       newValue = newValue ? [newValue] : []
     }
+
     setFieldTouched(field.id, true)
     setFieldValue(field.id, newValue)
   }
@@ -44,13 +46,15 @@ const SelectField = ({
   const activeSubform = useMemo(() => {
     if (MultipleTypeFormats.includes(field.schema.format)) return null
     if (!field.subforms?.length || !value?.length) return null
+
     return field.subforms.find(
-      (subform) => intersection(subform.options, value).length
+      (subform) => intersection(subform.options, castArray(value)).length
     )
   }, [value])
 
   const renderSubForm = () => {
     if (!activeSubform) return null
+
     return (
       <FieldsList
         fields={activeSubform.fields}
@@ -59,7 +63,6 @@ const SelectField = ({
         formikValues={formikValues}
         setFieldValue={setFieldValue}
         setFieldTouched={setFieldTouched}
-        handleBlur={handleBlur}
         renderTextField={renderTextField}
         renderNumberField={renderNumberField}
         renderDateField={renderDateField}
@@ -83,7 +86,7 @@ const SelectField = ({
     renderSubForm,
     isDynamicListItem,
     removeItem,
-    index
+    index,
   })
 }
 
@@ -92,7 +95,7 @@ SelectField.propTypes = {
   setFieldValue: PropTypes.func.isRequired,
   setFieldTouched: PropTypes.func.isRequired,
   value: PropTypes.oneOfType([PropTypes.string, PropTypes.array]),
-  error: PropTypes.string
+  error: PropTypes.string,
 }
 
 export default SelectField

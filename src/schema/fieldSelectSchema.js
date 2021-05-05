@@ -4,7 +4,7 @@ import { fieldSchema } from './fieldSchema'
 export const fieldSelectSchema = (field) => {
   const {
     schema: { format },
-    subforms
+    subforms,
   } = field
   const schema = Yup.mixed()
     .test(
@@ -30,7 +30,7 @@ export const fieldSelectSchema = (field) => {
               subform.options.includes(selectedOption)
             )
           },
-          then: fieldSchema(subformField).schema
+          then: fieldSchema(subformField).schema,
         })
       })
     })

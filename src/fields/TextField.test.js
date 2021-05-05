@@ -10,9 +10,9 @@ const renderForm = (f) => {
       {
         order: 1,
         title: 'Sec 1',
-        fields: [f]
-      }
-    ]
+        fields: [f],
+      },
+    ],
   }
 
   render(
@@ -47,8 +47,8 @@ test('default value', async () => {
     fieldType: 'text',
     title: 'field',
     schema: {
-      defaultValue: 'default string'
-    }
+      defaultValue: 'default string',
+    },
   }
   renderForm(field)
   expect(screen.queryByTestId('field-input')).toHaveValue(
@@ -64,12 +64,12 @@ test('required validation', async () => {
     required: true,
     title: 'field',
     schema: {
-      defaultValue: 'default string'
-    }
+      defaultValue: 'default string',
+    },
   }
   renderForm(field)
   fireEvent.change(screen.queryByTestId('field-input'), {
-    target: { value: '' }
+    target: { value: '' },
   })
   await waitFor(() =>
     expect(screen.queryByTestId('field-errors')).toHaveTextContent('*')
@@ -85,8 +85,8 @@ test('read only', async () => {
     title: 'field',
     schema: {
       readOnly: true,
-      defaultValue: 'default string'
-    }
+      defaultValue: 'default string',
+    },
   }
   renderForm(field)
   await waitFor(() =>
@@ -103,13 +103,13 @@ test('max and min validation', async () => {
     schema: {
       defaultValue: 'default string',
       min: 2,
-      max: 5
-    }
+      max: 5,
+    },
   }
   renderForm(field)
 
   fireEvent.change(screen.queryByTestId('field-input'), {
-    target: { value: 'A' }
+    target: { value: 'A' },
   })
   await waitFor(() =>
     expect(screen.queryByTestId('field-errors')).toHaveTextContent(
@@ -118,7 +118,7 @@ test('max and min validation', async () => {
   )
 
   fireEvent.change(screen.queryByTestId('field-input'), {
-    target: { value: 'ABCDEF' }
+    target: { value: 'ABCDEF' },
   })
   await waitFor(() =>
     expect(screen.queryByTestId('field-errors')).toHaveTextContent(
@@ -135,12 +135,12 @@ test('email validation', async () => {
     required: true,
     title: 'field',
     schema: {
-      format: 'email'
-    }
+      format: 'email',
+    },
   }
   renderForm(field)
   fireEvent.change(screen.queryByTestId('field-input'), {
-    target: { value: 'notanemail' }
+    target: { value: 'notanemail' },
   })
   await waitFor(() =>
     expect(screen.queryByTestId('field-errors')).toHaveTextContent(
@@ -148,7 +148,7 @@ test('email validation', async () => {
     )
   )
   fireEvent.change(screen.queryByTestId('field-input'), {
-    target: { value: 'ivan@test.com' }
+    target: { value: 'ivan@test.com' },
   })
   await waitFor(() =>
     expect(screen.queryByTestId('field-errors')).not.toHaveTextContent(

@@ -1,5 +1,92 @@
 import * as Yup from 'yup'
-import moment from 'moment'
+import {
+  isAfter,
+  isBefore,
+  isEqual,
+  startOfMinute,
+  endOfMinute,
+  startOfDay,
+  endOfDay,
+  addMinutes,
+} from 'date-fns'
+import { formatDate, TITLE_FORMAT, parseDate } from '../helpers/dataFormats'
+
+const applyMinAndMaxValues = (schema, field) => {
+  const { format } = field.schema
+  const title = TITLE_FORMAT[format]
+
+  let minValue = parseDate(field, field.schema.min)
+  let maxValue = parseDate(field, field.schema.max)
+
+  if (minValue) {
+    minValue =
+      format === 'date' ? startOfDay(minValue) : startOfMinute(minValue)
+    const minValueFormated = formatDate(field, minValue, true)
+
+    schema = schema.test(
+      'is-before',
+      `La ${title} debe ser mayor o igual a ${minValueFormated}`,
+      (dateStr) => {
+        const date = parseDate(field, dateStr)
+
+        if (date) return isAfter(date, minValue) || isEqual(date, minValue)
+
+        return true
+      }
+    )
+  }
+
+  if (maxValue) {
+    maxValue = format === 'date' ? endOfDay(maxValue) : endOfMinute(maxValue)
+    const maxValueFormated = formatDate(field, maxValue, true)
+
+    schema = schema.test(
+      'is-before',
+      `La ${title} debe ser menor o igual a ${maxValueFormated}`,
+      (dateStr) => {
+        const date = parseDate(field, dateStr)
+
+        if (date) return isBefore(date, maxValue) || isEqual(date, maxValue)
+
+        return true
+      }
+    )
+  }
+
+  return schema
+}
+
+const applyMinCurrentDate = (schema, field) => {
+  const { format } = field.schema
+
+  // eslint-disable-next-line func-names
+  schema = schema.test('is-after-or-equal-to-current-date', function (dateStr) {
+    if (dateStr) {
+      const currentDate =
+        format === 'date' ? startOfDay(new Date()) : new Date()
+      let date = parseDate(field, dateStr)
+
+      if (format !== 'date') date = addMinutes(date, 1) // to prevent invalidating due to difference in fractions of seconds
+
+      const isValid = isAfter(date, currentDate) || isEqual(date, currentDate)
+
+      if (!isValid) {
+        const title = TITLE_FORMAT[format]
+        const currentDateFormatted = formatDate(field, currentDate, true)
+
+        return this.createError({
+          message: `La ${title} debe ser mayor o igual a la actual ${currentDateFormatted}`,
+        })
+      }
+
+      return true
+    }
+
+    return true
+  })
+
+  return schema
+}
 
 export const fieldDateSchema = (field) => {
   let schema = Yup.string()
@@ -9,110 +96,14 @@ export const fieldDateSchema = (field) => {
         ? `${field.title} debe ser una hora válida`
         : `${field.title} debe ser una fecha válida`
     )
-  if (field.schema.format === 'time') {
-    if (field.schema.min) {
-      schema = schema.test(
-        'is-before',
-        `La hora debe ser mayor o igual a ${moment(
-          field.schema.min.substring(0, field.schema.min.indexOf('-')),
-          'HH mm'
-        ).format('hh:mm A')}`,
-        (value) => {
-          const minHour = field.schema.min
-          if (value && minHour) {
-            return moment(value, 'HH:mm').isSameOrAfter(
-              moment(minHour.substring(0, minHour.indexOf('-')), 'HH:mm')
-            )
-          }
-          return true
-        }
-      )
-    }
-    if (field.schema.max) {
-      schema = schema.test(
-        'is-before',
-        `La hora debe ser menor o igual a ${moment(
-          field.schema.max.substring(0, field.schema.max.indexOf('-')),
-          'HH mm'
-        ).format('hh:mm A')}`,
-        (value) => {
-          const maxHour = field.schema.max
-          if (value && maxHour) {
-            return moment(value, 'HH:mm').isBefore(
-              moment(maxHour.substring(0, maxHour.indexOf('-')), 'HH:mm')
-            )
-          }
-          return true
-        }
-      )
-    }
-  }
-  if (field.schema.format === 'date-time') {
-    if (field.schema.min) {
-      schema = schema.test(
-        'is-before',
-        `La fecha/hora debe ser mayor o igual a ${moment(
-          field.schema.min
-        ).format('YYYY-MM-DD hh:mm a')}`,
-        (value) => {
-          const minDate = field.schema.min
-          if (value && minDate) {
-            const start = minDate
-            return moment(value).isSameOrAfter(moment(start))
-          }
-          return true
-        }
-      )
-    }
-    if (field.schema.max) {
-      schema = schema.test(
-        'is-before',
-        `La fecha/hora debe ser menor o igual a ${moment(
-          field.schema.max
-        ).format('YYYY-MM-DD hh:mm a')}`,
-        (value) => {
-          const maxDate = field.schema.max
-          if (value && maxDate) {
-            return moment(value).isBefore(moment(maxDate).add(1, 'minutes'))
-          }
-          return true
-        }
-      )
-    }
-  }
+
   if (field.schema.minCurrentDate) {
-    schema = schema.test('is-before', function (value) {
-      if (value && field.schema.format !== 'date') {
-        const currentDate = new Date()
-        let text = ''
-        let format = ''
-        let valueDate = value
-        if (field.schema.format === 'date-time') {
-          text = 'fecha/hora'
-          format = 'YYYY-MM-DD hh:mm a'
-          valueDate = moment(value).add(1, 'minutes')
-        } else if (field.schema.format === 'time') {
-          text = 'hora'
-          format = 'hh:mm a'
-          valueDate = moment(value, 'HH:mm').add(1, 'minutes')
-        } else {
-          text = 'hora'
-          format = 'hh:mm a'
-        }
-        return moment(valueDate).isSameOrAfter(currentDate)
-          ? true
-          : this.createError({
-              message: `La ${text} debe ser mayor o igual a la actual ${moment(
-                currentDate
-              ).format(format)}`
-            })
-      }
-      return true
-    })
+    schema = applyMinCurrentDate(schema, field)
+  } else {
+    schema = applyMinAndMaxValues(schema, field)
   }
-  if (field.required) {
-    schema = schema.required('*')
-  }
+
+  if (field.required) schema = schema.required('*')
 
   return { schema }
 }

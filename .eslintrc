@@ -1,11 +1,6 @@
 {
   "extends": ["airbnb", "prettier"],
-  "parser": "babel-eslint",
-  "parserOptions": {
-    "ecmaFeatures": {
-      "legacyDecorators": true
-    }
-  },
+  "parser": "@babel/eslint-parser",
   "settings": {
     "import/resolver": {
       "node": {
@@ -37,5 +32,6 @@
   "env": {
     "jest": true
   },
-  "ignorePatterns": [".gitignore", "serviceWorker.js"]
+  "ignorePatterns": [".gitignore", "serviceWorker.js"],
+  "plugins": ["@babel", "prettier"]
 }

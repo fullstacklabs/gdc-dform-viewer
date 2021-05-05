@@ -7,14 +7,14 @@ import FieldsList from './fields/FieldsList'
 import {
   mapAnswersToFormValues,
   mapFormValuesToAnswers,
-  flattenFormFields
+  flattenFormFields,
 } from './helpers/formMapper'
 
 const DForm = ({
-  initialSectionIndex,
+  sectionIndex = 0,
   form,
   onSubmit,
-  answers,
+  answers = [],
   renderSection,
   renderTextField,
   renderNumberField,
@@ -26,18 +26,14 @@ const DForm = ({
   renderSignatureField,
   renderTotalizerField,
   renderDynamicListField,
-  renderListItem
+  renderListItem,
 }) => {
-  // const dispatch = useDispatch();
-  const [currentSectionIndex, setCurrentSectionIndex] = useState(
-    initialSectionIndex
-  )
+  const [currentSectionIndex, setCurrentSectionIndex] = useState(sectionIndex)
 
   useEffect(() => {
-    if (currentSectionIndex !== initialSectionIndex) {
-      setCurrentSectionIndex(initialSectionIndex)
-    }
-  }, [initialSectionIndex])
+    if (currentSectionIndex !== sectionIndex)
+      setCurrentSectionIndex(sectionIndex)
+  }, [sectionIndex])
 
   const allFormFieldsFlatten = useMemo(() => flattenFormFields(form), [])
   const orderedSections = useMemo(
@@ -60,7 +56,7 @@ const DForm = ({
   )
 
   const validationSchema = useMemo(() => sectionSchema(section.fields), [
-    section.fields
+    section.fields,
   ])
 
   const formik = useFormik({
@@ -68,35 +64,29 @@ const DForm = ({
     enableReinitialize: true,
     validationSchema,
     validateOnMount: true,
-    validateOnChange: true
+    validateOnChange: true,
   })
 
   useEffect(() => {
     setFormikValues({
       ...formikValues,
-      ...formik.values
+      ...formik.values,
     })
     setFormikTouched({
       ...formikTouched,
-      ...formik.touched
+      ...formik.touched,
     })
   }, [formik.values, formik.touched])
 
-  const {
-    isValid,
-    setFieldTouched,
-    setFieldValue,
-    handleBlur,
-    values,
-    errors
-  } = formik
+  const { isValid, setFieldTouched, setFieldValue, values, errors } = formik
 
   const moveToNextSection = () => {
-    setCurrentSectionIndex(currentSectionIndex + 1)
+    if (currentSectionIndex < orderedSections.length - 1)
+      setCurrentSectionIndex(currentSectionIndex + 1)
   }
 
   const moveToPrevSection = () => {
-    setCurrentSectionIndex(currentSectionIndex - 1)
+    if (currentSectionIndex > 0) setCurrentSectionIndex(currentSectionIndex - 1)
   }
 
   const renderFields = () => (
@@ -108,7 +98,6 @@ const DForm = ({
         formikValues={formikValues}
         setFieldValue={setFieldValue}
         setFieldTouched={setFieldTouched}
-        handleBlur={handleBlur}
         renderTextField={renderTextField}
         renderNumberField={renderNumberField}
         renderDateField={renderDateField}
@@ -118,9 +107,9 @@ const DForm = ({
         renderSelectField={renderSelectField}
         renderSignatureField={renderSignatureField}
         renderTotalizerField={renderTotalizerField}
-        allFormFieldsFlatten={allFormFieldsFlatten}
         renderDynamicListField={renderDynamicListField}
         renderListItem={renderListItem}
+        allFormFieldsFlatten={allFormFieldsFlatten}
       />
     </FormikProvider>
   )
@@ -132,29 +121,30 @@ const DForm = ({
       answers,
       allFormFieldsFlatten
     )
+
     onSubmit(updatedAnswers)
   }
 
   return renderSection({
-    renderFields,
     section,
-    moveToNextSection:
-      currentSectionIndex < form.sections.length - 1 ? moveToNextSection : null,
-    moveToPrevSection: currentSectionIndex > 0 ? moveToPrevSection : null,
+    renderFields,
+    moveToPrevSection,
+    moveToNextSection,
     isValid,
-    submit
+    submit,
+    currentSectionIndex,
+    sectionsLength: orderedSections.length,
+    hasUnsavedChanges: Object.keys(formikTouched).length > 0,
   })
 }
 
-export default DForm
-
 DForm.defaultProps = {
-  initialSectionIndex: 0,
-  answers: []
+  sectionIndex: 0,
+  answers: [],
 }
 
 DForm.propTypes = {
-  initialSectionIndex: PropTypes.number,
+  sectionIndex: PropTypes.number,
   form: PropTypes.shape({
     sections: PropTypes.arrayOf(
       PropTypes.shape({
@@ -162,22 +152,45 @@ DForm.propTypes = {
         fields: PropTypes.arrayOf(
           PropTypes.shape({
             id: PropTypes.number.isRequired,
-            title: PropTypes.string.isRequired
+            title: PropTypes.string.isRequired,
           })
-        )
+        ),
       })
-    )
+    ),
   }).isRequired,
   answers: PropTypes.arrayOf(
     PropTypes.shape({
-      id: PropTypes.number,
+      id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
       fieldId: PropTypes.number,
       value: PropTypes.oneOfType([
         PropTypes.string,
         PropTypes.number,
-        PropTypes.object
-      ])
+        // GPS position
+        PropTypes.shape({
+          x: PropTypes.number,
+          y: PropTypes.number,
+        }),
+        // Dynamic list field 'value' is an array of objects
+        PropTypes.arrayOf(
+          PropTypes.shape({
+            id: PropTypes.number,
+            order: PropTypes.number,
+            answers: PropTypes.arrayOf(
+              PropTypes.shape({
+                id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+                fieldId: PropTypes.number,
+                value: PropTypes.oneOfType([
+                  PropTypes.string,
+                  PropTypes.number,
+                ]),
+              })
+            ),
+          })
+        ),
+      ]),
     })
-  ).isRequired,
-  onSubmit: PropTypes.func.isRequired
+  ),
+  onSubmit: PropTypes.func.isRequired,
 }
+
+export default DForm

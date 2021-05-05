@@ -10,9 +10,9 @@ const renderForm = (field) => {
       {
         order: 1,
         title: 'Sec 1',
-        fields: [field]
-      }
-    ]
+        fields: [field],
+      },
+    ],
   }
 
   render(
@@ -48,8 +48,8 @@ test('default integer value', async () => {
     title: 'El num',
     fieldType: 'number',
     schema: {
-      defaultValue: 450
-    }
+      defaultValue: 450,
+    },
   }
   renderForm(field)
   expect(screen.queryByTestId('field-input')).toHaveValue(
@@ -64,8 +64,8 @@ test('default float value', async () => {
     title: 'El num',
     fieldType: 'number',
     schema: {
-      defaultValue: 4.5
-    }
+      defaultValue: 4.5,
+    },
   }
   renderForm(field)
   expect(screen.queryByTestId('field-input')).toHaveValue(
@@ -81,13 +81,13 @@ test('integer max and min validation', async () => {
     fieldType: 'number',
     schema: {
       min: 10,
-      max: 20
-    }
+      max: 20,
+    },
   }
   renderForm(field)
 
   fireEvent.change(screen.queryByTestId('field-input'), {
-    target: { value: '9' }
+    target: { value: '9' },
   })
   await waitFor(() =>
     expect(screen.queryByTestId('field-errors')).toHaveTextContent(
@@ -96,7 +96,7 @@ test('integer max and min validation', async () => {
   )
 
   fireEvent.change(screen.queryByTestId('field-input'), {
-    target: { value: '21' }
+    target: { value: '21' },
   })
   await waitFor(() =>
     expect(screen.queryByTestId('field-errors')).toHaveTextContent(
@@ -105,7 +105,7 @@ test('integer max and min validation', async () => {
   )
 
   fireEvent.change(screen.queryByTestId('field-input'), {
-    target: { value: '19' }
+    target: { value: '19' },
   })
   await waitFor(() =>
     expect(screen.queryByTestId('field-errors')).toBeEmptyDOMElement()
@@ -121,13 +121,13 @@ test('float max and min validation', async () => {
     schema: {
       format: 'number',
       min: 10.5,
-      max: 20.8
-    }
+      max: 20.8,
+    },
   }
   renderForm(field)
 
   fireEvent.change(screen.queryByTestId('field-input'), {
-    target: { value: '10.40' }
+    target: { value: '10.40' },
   })
   await waitFor(() =>
     expect(screen.queryByTestId('field-errors')).toHaveTextContent(
@@ -136,7 +136,7 @@ test('float max and min validation', async () => {
   )
 
   fireEvent.change(screen.queryByTestId('field-input'), {
-    target: { value: '20.90' }
+    target: { value: '20.90' },
   })
   await waitFor(() =>
     expect(screen.queryByTestId('field-errors')).toHaveTextContent(
@@ -145,7 +145,7 @@ test('float max and min validation', async () => {
   )
 
   fireEvent.change(screen.queryByTestId('field-input'), {
-    target: { value: '19.00' }
+    target: { value: '19.00' },
   })
   await waitFor(() =>
     expect(screen.queryByTestId('field-errors')).toBeEmptyDOMElement()
@@ -160,8 +160,8 @@ test('read only', async () => {
     fieldType: 'number',
     schema: {
       format: 'number',
-      readOnly: true
-    }
+      readOnly: true,
+    },
   }
   renderForm(field)
   await waitFor(() =>
@@ -178,34 +178,34 @@ test('float number transformation(two decimals)', async () => {
     schema: {
       format: 'number',
       min: 10.5,
-      max: 20.8
-    }
+      max: 20.8,
+    },
   }
   renderForm(field)
 
   fireEvent.change(screen.queryByTestId('field-input'), {
-    target: { value: '1040' }
+    target: { value: '1040' },
   })
   await waitFor(() =>
-    expect(screen.queryByTestId('field-input')).toHaveValue('10.40')
+    expect(screen.queryByTestId('field-input')).toHaveValue('10.4')
   )
 
   fireEvent.change(screen.queryByTestId('field-input'), {
-    target: { value: '104666' }
+    target: { value: '104666' },
   })
   await waitFor(() =>
     expect(screen.queryByTestId('field-input')).toHaveValue('1046.66')
   )
 
   fireEvent.change(screen.queryByTestId('field-input'), {
-    target: { value: '1046660' }
+    target: { value: '1046660' },
   })
   await waitFor(() =>
-    expect(screen.queryByTestId('field-input')).toHaveValue('10466.60')
+    expect(screen.queryByTestId('field-input')).toHaveValue('10466.6')
   )
 
   fireEvent.change(screen.queryByTestId('field-input'), {
-    target: { value: '00666' }
+    target: { value: '00666' },
   })
   await waitFor(() =>
     expect(screen.queryByTestId('field-input')).toHaveValue('6.66')
