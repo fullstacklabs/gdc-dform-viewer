@@ -1,5 +1,5 @@
+import { isNumber } from 'lodash'
 import * as Yup from 'yup'
-import { is } from 'rambdax'
 
 export const fieldNumberSchema = (field) => {
   let schema = Yup.number()
@@ -8,13 +8,13 @@ export const fieldNumberSchema = (field) => {
       'min-number',
       `${field.title} debe ser un valor mayor o igual que ${field.schema.min}`,
       (value) =>
-        !field.schema.min || !is(Number, value) || value >= field.schema.min
+        !field.schema.min || !isNumber(value) || value >= field.schema.min
     )
     .test(
       'max-number',
       `${field.title} debe ser un valor menor o igual que ${field.schema.max}`,
       (value) =>
-        !field.schema.max || !is(Number, value) || value <= field.schema.max
+        !field.schema.max || !isNumber(value) || value <= field.schema.max
     )
     .label(field.title)
 

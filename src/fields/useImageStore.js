@@ -1,45 +1,20 @@
-import { useState, useEffect } from 'react'
-// import { useSelector } from 'react-redux';
+import { useState } from 'react'
 
 export default function useImageStore({
   field,
   value,
   setFieldValue,
-  setFieldTouched
-  // handleBlur,
+  setFieldTouched,
 }) {
   const [initialValue] = useState(value)
-  const [imageSource, setImageSource] = useState(initialValue)
-  useEffect(() => {
-    if (value !== imageSource) {
-      setImageSource(value)
-    }
-  }, [value])
-  // const imagesUploadStatus = useSelector(
-  //   ({ formFile }) => formFile.imagesUploadStatus[field.id],
-  // );
-
-  // useEffect(() => {
-  //   if (
-  //     imagesUploadStatus
-  //     && imagesUploadStatus.status === 'success'
-  //     && !imagesUploadStatus.uploaded
-  //   ) {
-  //     setFieldValue(field.id, {
-  //       ...imageSource,
-  //       uploaded: true,
-  //       answerValue: imagesUploadStatus.answerValue,
-  //     });
-  //   }
-  // }, [imagesUploadStatus]);
+  const [imageSource, setImageSource] = useState(initialValue) // TODO: Is this really necessary? it holds the same data as the field value
 
   const onSave = async (data) => {
-    // handleBlur(field.id);
     const imageData = {
       ...data,
       uploaded: false,
       stored: false,
-      fieldType: field.fieldType
+      fieldType: field.fieldType, // 'image' or 'signature'
     }
     setFieldTouched(field.id, true)
     setFieldValue(field.id, imageData)
@@ -61,14 +36,21 @@ export default function useImageStore({
     setFieldValue(field.id, initialValue)
   }
 
+  const onImageUploaded = (value) => {
+    setFieldValue(field.id, {
+      ...imageSource,
+      uploaded: true,
+      answerValue: value,
+    })
+  }
+
   return {
-    onSave,
-    onClear,
-    onUndo,
     imageSource,
+    onSave,
+    onImageUploaded,
+    onUndo,
+    onClear,
     canUndo: initialValue && initialValue.stored,
-    canClear: !!imageSource
-    // errorUploading:
-    // !!imagesUploadStatus && imagesUploadStatus.status === 'error',
+    canClear: !!imageSource,
   }
 }

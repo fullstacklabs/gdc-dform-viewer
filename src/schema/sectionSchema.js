@@ -12,7 +12,7 @@ export const sectionSchema = (sectionFields) => {
     if (subformSchema) {
       validationSchema = {
         ...validationSchema,
-        ...subformSchema
+        ...subformSchema,
       }
     }
   })

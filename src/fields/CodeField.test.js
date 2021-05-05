@@ -10,9 +10,9 @@ const renderForm = (field) => {
       {
         order: 1,
         title: 'Sec 1',
-        fields: [field]
-      }
-    ]
+        fields: [field],
+      },
+    ],
   }
 
   render(
@@ -46,14 +46,14 @@ test('required validation', async () => {
     fieldType: 'code',
     required: true,
     title: 'field',
-    schema: {}
+    schema: {},
   }
   renderForm(field)
   await waitFor(() =>
     expect(screen.queryByTestId('field-errors')).toHaveTextContent('*')
   )
   fireEvent.change(screen.queryByTestId('field-input'), {
-    target: { value: 'acodedstring' }
+    target: { value: 'acodedstring' },
   })
   await waitFor(() =>
     expect(screen.queryByTestId('field-errors')).toBeEmptyDOMElement()

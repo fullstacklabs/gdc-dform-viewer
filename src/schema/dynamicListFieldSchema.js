@@ -7,7 +7,7 @@ export const dynamicListFieldSchema = (field) => {
       field.templateFields.reduce(
         (acc, templateField) => ({
           ...acc,
-          [`FS${templateField.id}`]: fieldSchema(templateField).schema
+          [`FS${templateField.id}`]: fieldSchema(templateField).schema,
         }),
         {}
       )

@@ -10,9 +10,9 @@ const renderForm = (fields) => {
       {
         order: 1,
         title: 'Sec 1',
-        fields
-      }
-    ]
+        fields,
+      },
+    ],
   }
 
   render(
@@ -57,8 +57,8 @@ test('run totalizer function for all section fields', async () => {
         }
 
         return 'No hay resultado aún';
-      `
-    }
+      `,
+    },
   }
 
   const t1Field = {
@@ -67,7 +67,7 @@ test('run totalizer function for all section fields', async () => {
     title: 't1',
     fieldType: 'number',
     referenceId: 'f2',
-    schema: {}
+    schema: {},
   }
 
   const t2Field = {
@@ -76,7 +76,7 @@ test('run totalizer function for all section fields', async () => {
     title: 't2',
     fieldType: 'number',
     referenceId: 'f3',
-    schema: {}
+    schema: {},
   }
 
   const tasaField = {
@@ -87,8 +87,8 @@ test('run totalizer function for all section fields', async () => {
     referenceId: 'tasa',
     schema: {
       defaultValue: 5,
-      readOnly: true
-    }
+      readOnly: true,
+    },
   }
 
   renderForm([totalizerField, t1Field, t2Field, tasaField])
@@ -98,10 +98,10 @@ test('run totalizer function for all section fields', async () => {
     )
   )
   fireEvent.change(screen.queryByTestId(`field-input-${t1Field.id}`), {
-    target: { value: '7' }
+    target: { value: '7' },
   })
   fireEvent.change(screen.queryByTestId(`field-input-${t2Field.id}`), {
-    target: { value: '3' }
+    target: { value: '3' },
   })
   await waitFor(() =>
     expect(screen.queryByTestId('totalized-value')).toHaveTextContent(

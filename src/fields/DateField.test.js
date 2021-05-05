@@ -1,7 +1,6 @@
 import React from 'react'
 import { render, fireEvent, waitFor, screen } from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect'
-// import moment from 'moment';
 import DForm from '../DForm'
 
 const renderForm = (field) => {
@@ -10,9 +9,9 @@ const renderForm = (field) => {
       {
         order: 1,
         title: 'Sec 1',
-        fields: [field]
-      }
-    ]
+        fields: [field],
+      },
+    ],
   }
 
   render(
@@ -48,8 +47,8 @@ test('default date value', async () => {
     fieldType: 'date',
     schema: {
       format: 'date',
-      defaultValue: '2020-01-06'
-    }
+      defaultValue: '2020-01-06',
+    },
   }
   renderForm(field)
   expect(screen.queryByTestId('field-input')).toHaveValue(
@@ -66,13 +65,13 @@ test('date-time max and min validation', async () => {
     schema: {
       format: 'date-time',
       min: '2020-01-23T00:00:00',
-      max: '2020-09-13T00:00:00'
-    }
+      max: '2020-09-13T00:00:00',
+    },
   }
   renderForm(field)
 
   fireEvent.change(screen.queryByTestId('field-input'), {
-    target: { value: '2020-01-22' }
+    target: { value: '2020-01-22' },
   })
   await waitFor(() =>
     expect(screen.queryByTestId('field-errors')).toHaveTextContent(
@@ -81,7 +80,7 @@ test('date-time max and min validation', async () => {
   )
 
   fireEvent.change(screen.queryByTestId('field-input'), {
-    target: { value: '2020-09-14' }
+    target: { value: '2020-09-14' },
   })
   await waitFor(() =>
     expect(screen.queryByTestId('field-errors')).toHaveTextContent(
@@ -90,7 +89,7 @@ test('date-time max and min validation', async () => {
   )
 
   fireEvent.change(screen.queryByTestId('field-input'), {
-    target: { value: '2020-09-13' }
+    target: { value: '2020-09-13' },
   })
   await waitFor(() =>
     expect(screen.queryByTestId('field-errors')).toBeEmptyDOMElement()
@@ -106,13 +105,13 @@ test('time max and min validation', async () => {
     schema: {
       format: 'time',
       min: '08:00:06-05:00',
-      max: '15:00:06-05:00'
-    }
+      max: '15:00:06-05:00',
+    },
   }
   renderForm(field)
 
   fireEvent.change(screen.queryByTestId('field-input'), {
-    target: { value: '2020-01-23T07:59' }
+    target: { value: '2020-01-23T07:59' },
   })
   await waitFor(() =>
     expect(screen.queryByTestId('field-errors')).toHaveTextContent(
@@ -121,7 +120,7 @@ test('time max and min validation', async () => {
   )
 
   fireEvent.change(screen.queryByTestId('field-input'), {
-    target: { value: '2020-01-23T15:01' }
+    target: { value: '2020-01-23T15:01' },
   })
   await waitFor(() =>
     expect(screen.queryByTestId('field-errors')).toHaveTextContent(
@@ -130,7 +129,7 @@ test('time max and min validation', async () => {
   )
 
   fireEvent.change(screen.queryByTestId('field-input'), {
-    target: { value: '2020-01-23T08:00' }
+    target: { value: '2020-01-23T08:00' },
   })
   await waitFor(() =>
     expect(screen.queryByTestId('field-errors')).toBeEmptyDOMElement()
@@ -150,7 +149,7 @@ test('time max and min validation', async () => {
 //   };
 //   renderForm(field);
 //
-//   fireEvent.change(screen.queryByTestId('field-input'), { target: { value: moment() } });
+//   fireEvent.change(screen.queryByTestId('field-input'), { target: { value: new Date() } });
 //   await waitFor(() => (
 //     expect(
 //       screen.queryByTestId('field-errors'),

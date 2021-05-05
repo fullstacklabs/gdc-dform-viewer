@@ -10,9 +10,9 @@ const renderForm = (field, gps) => {
       {
         order: 1,
         title: 'Sec 1',
-        fields: [field]
-      }
-    ]
+        fields: [field],
+      },
+    ],
   }
 
   render(
@@ -45,14 +45,14 @@ test('required validation', async () => {
     fieldType: 'gps',
     required: true,
     title: 'field',
-    schema: {}
+    schema: {},
   }
   renderForm(field, { x: 1, y: 2 })
   await waitFor(() =>
     expect(screen.queryByTestId('field-errors')).toHaveTextContent('*')
   )
   fireEvent.change(screen.queryByTestId('field-input'), {
-    target: { value: 'a' }
+    target: { value: 'a' },
   })
   await waitFor(() =>
     expect(screen.queryByTestId('field-errors')).toBeEmptyDOMElement()

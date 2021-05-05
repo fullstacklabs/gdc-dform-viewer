@@ -1,5 +1,5 @@
-// import React from 'react';
 import PropTypes from 'prop-types'
+
 const TextField = ({
   setFieldTouched,
   setFieldValue,
@@ -9,7 +9,7 @@ const TextField = ({
   field,
   isDynamicListItem,
   removeItem,
-  index
+  index,
 }) => {
   const onFieldChange = (newValue) => {
     setFieldTouched(field.id, true)
@@ -23,7 +23,7 @@ const TextField = ({
     onFieldChange,
     isDynamicListItem,
     removeItem,
-    index
+    index,
   })
 }
 
@@ -32,7 +32,7 @@ TextField.propTypes = {
   setFieldValue: PropTypes.func.isRequired,
   setFieldTouched: PropTypes.func.isRequired,
   value: PropTypes.string,
-  error: PropTypes.string
+  error: PropTypes.string,
 }
 
 export default TextField

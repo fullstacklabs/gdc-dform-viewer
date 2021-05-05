@@ -6,7 +6,7 @@ function buildOrderWithReferences(fields, formikValues) {
     if (field.referenceId) {
       return {
         ...acc,
-        [field.referenceId]: formikValues[field.id]
+        [field.referenceId]: formikValues[field.id],
       }
     }
     return acc
@@ -31,7 +31,7 @@ const TotalizerField = ({ allFormFields, allFormValues, render, field }) => {
     return render({
       field,
       totalizedValue: null,
-      errorDefinition: true
+      errorDefinition: true,
     })
   }
 
@@ -48,7 +48,7 @@ const TotalizerField = ({ allFormFields, allFormValues, render, field }) => {
   return render({
     field,
     totalizedValue,
-    errorDefinition: false
+    errorDefinition: false,
   })
 }
 
@@ -57,11 +57,11 @@ TotalizerField.propTypes = {
   allFormFields: PropTypes.arrayOf(
     PropTypes.shape({
       id: PropTypes.number,
-      referenceId: PropTypes.string
+      referenceId: PropTypes.string,
     })
   ),
   // eslint-disable-next-line react/forbid-prop-types
-  allFormValues: PropTypes.object
+  allFormValues: PropTypes.object,
 }
 
 export default TotalizerField

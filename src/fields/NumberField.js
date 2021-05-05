@@ -1,17 +1,18 @@
 import { useEffect, useState } from 'react'
-import { isNil } from 'rambdax'
 import PropTypes from 'prop-types'
+import { isNil } from 'lodash'
 
 const maxNumber = 99999999999999.98
 
-const parseNumber = (value, format) => {
+const parseNumber = (value, field, asNumber) => {
   if (isNil(value) || Number.isNaN(value)) return ''
 
-  if (typeof value === 'number') return value
+  if (typeof value === 'number') return asNumber ? value : String(value)
 
   let numberStr = ''
 
-  if (format === 'number') {
+  // if decimal
+  if (field.schema.format === 'number') {
     if (value.length === 1) return `0.0${value}`
 
     if (value) {
@@ -31,52 +32,39 @@ const parseNumber = (value, format) => {
         .replace(/^\.([0-9]+)$/g, '0.$1')
         .replace(/^([0-9]+)\.0$/g, '$1.00')
     }
+    // else integer
   } else {
     numberStr = value.replace(/[^0-9]/g, '')
   }
 
-  const number = Number(numberStr)
-
-  return number
+  return asNumber ? Number(numberStr) : numberStr
 }
 
 const NumberField = ({
   setFieldTouched,
   setFieldValue,
-  handleBlur,
-  value,
+  value, // Number value
   error,
   render,
   field,
   isDynamicListItem,
   removeItem,
-  index
+  index,
 }) => {
-  const [inputValue, setInputvalue] = useState(() => {
-    if (isNil(value) || Number.isNaN(value)) return ''
-
-    if (field.schema.format === 'number') {
-      return String(value).replace(/^([0-9]+)$/, '$1.00')
-    }
-
-    return String(value)
-  })
+  // inputValue → String representation of the numeric value ('value')
+  const [inputValue, setInputvalue] = useState(() => parseNumber(value, field))
 
   useEffect(() => {
-    setInputvalue(parseNumber(value, field.schema.format))
+    setInputvalue(parseNumber(value, field))
   }, [value, field.schema.format])
 
   const onFieldChange = (newValue) => {
-    const number = parseNumber(newValue, field.schema.format)
+    const number = parseNumber(newValue, field, true)
 
     if (number < maxNumber) {
       setFieldTouched(field.id, true, true)
       setFieldValue(field.id, number === '' ? null : number)
     }
-  }
-
-  const onBlur = () => {
-    handleBlur(field.id)
   }
 
   return render({
@@ -85,10 +73,9 @@ const NumberField = ({
     inputValue,
     onFieldChange,
     error,
-    onBlur,
     isDynamicListItem,
     removeItem,
-    index
+    index,
   })
 }
 
@@ -96,9 +83,8 @@ NumberField.propTypes = {
   render: PropTypes.func.isRequired,
   setFieldValue: PropTypes.func.isRequired,
   setFieldTouched: PropTypes.func.isRequired,
-  value: PropTypes.number,
+  value: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
   error: PropTypes.string,
-  handleBlur: PropTypes.func.isRequired
 }
 
 export default NumberField

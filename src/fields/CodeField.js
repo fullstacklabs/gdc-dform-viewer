@@ -1,4 +1,3 @@
-// import React from 'react';
 import PropTypes from 'prop-types'
 
 const CodeField = ({
@@ -7,7 +6,7 @@ const CodeField = ({
   value,
   error,
   render,
-  field
+  field,
 }) => {
   const onFieldChange = (newValue) => {
     setFieldTouched(field.id, true)
@@ -18,7 +17,7 @@ const CodeField = ({
     field,
     value,
     error,
-    onFieldChange
+    onFieldChange,
   })
 }
 
@@ -27,7 +26,7 @@ CodeField.propTypes = {
   setFieldValue: PropTypes.func.isRequired,
   setFieldTouched: PropTypes.func.isRequired,
   value: PropTypes.string,
-  error: PropTypes.string
+  error: PropTypes.string,
 }
 
 export default CodeField

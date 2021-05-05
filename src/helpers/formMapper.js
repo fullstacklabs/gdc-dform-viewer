@@ -1,92 +1,101 @@
-import { flatten, is, isNil, omit } from 'rambdax'
-import moment from 'moment'
+import { groupBy, isNil, isPlainObject, omit } from 'lodash'
 
 const ImagesTypeFields = ['image', 'signature']
 
 export const flattenFields = (fields) =>
   fields.reduce((acc, field) => {
-    if (field.subforms && field.subforms.length) {
-      const subformFields = flatten(
-        field.subforms.map((subform) => subform.fields)
-      )
+    if (field.subforms?.length) {
+      const subformFields = field.subforms
+        .map((subform) => subform.fields)
+        .flat(Infinity)
+
       return [...acc, ...subformFields, field]
     }
     return [...acc, field]
   }, [])
 
 export const flattenFormFields = (form) =>
-  flatten(form.sections.map((section) => flattenFields(section.fields)))
+  form.sections.map((section) => flattenFields(section.fields)).flat(Infinity)
 
-const formatDateValueToFormValue = (field, value) => {
-  if (!value) return value
-  switch (field.schema.format) {
-    case 'date':
-      return moment(value).format('YYYY-MM-DD')
-    default:
-      return value
-  }
-}
-
-export const mapFieldAnswersToFormValues = (field, answers, formValues) => {
-  if (formValues[field.id]) {
-    return formValues[field.id]
-  }
-
+export const mapFieldAnswersToFormValues = (
+  field,
+  answersByFieldId,
+  formValues
+) => {
+  if (formValues[field.id]) return formValues[field.id]
   if (field.fieldType === 'totalizer') return null
-  const storedAnswers = answers.filter((x) => +x.fieldId === +field.id)
+
+  const fieldAnswers = answersByFieldId[field.id] || []
+
   if (field.fieldType === 'select' && field.schema.multiple) {
-    return storedAnswers.map((answer) => answer.value)
+    return fieldAnswers.map((answer) => answer.value)
   }
 
-  const storedAnswer = storedAnswers[0]
+  const fieldAnswer = fieldAnswers[0]
 
   if (field.fieldType === 'dynamicList') {
-    if (!storedAnswer) {
-      return []
-    }
-    return storedAnswer.value.map((lineItems, index) =>
+    if (!fieldAnswer) return []
+
+    return fieldAnswer.value.map((listItem, index) =>
       field.templateFields.reduce(
-        (acc, templateField) => ({
-          _key: index,
-          ...acc,
-          [`FS${templateField.id}`]: mapFieldAnswersToFormValues(
-            templateField,
-            lineItems.answers,
-            formValues
+        (acc, templateField) => {
+          const listItemAnswersByFieldId = groupBy(
+            listItem.answers,
+            templateField.id
           )
-        }),
-        {}
+
+          return {
+            ...acc,
+            [`FS${templateField.id}`]: mapFieldAnswersToFormValues(
+              templateField,
+              listItemAnswersByFieldId,
+              formValues
+            ),
+          }
+        },
+        { _key: index }
       )
     )
   }
 
   if (ImagesTypeFields.includes(field.fieldType)) {
-    if (!storedAnswer) return null
+    if (!fieldAnswer) return null
+    if (isPlainObject(storedAnswer.value)) return storedAnswer.value
+
     return {
       fieldType: field.fieldType,
-      uri: storedAnswer.value,
+      uri: fieldAnswer.value,
       uploaded: true,
-      stored: true
+      stored: true,
     }
   }
 
-  let defaultV = field.schema?.defaultValue || undefined
+  let value
 
-  defaultV = storedAnswer ? storedAnswer.value : defaultV
-  const fieldAnswer = answers.find((answer) => +answer.fieldId === +field.id)
-  defaultV = (fieldAnswer && fieldAnswer.value) || defaultV
-  if (field.fieldType === 'date') {
-    defaultV = formatDateValueToFormValue(field, defaultV)
+  if (field.schema) value = field.schema.defaultValue
+
+  if (fieldAnswer) {
+    value = fieldAnswer.value
+
+    // workarround to extract only the date value (yyyy-MM-dd)
+    // when the field format is only date
+    // i.e. '2021-05-06 20:00:00' → '2021-05-06'
+    if (field.fieldType === 'date' && field.schema.format === 'date') {
+      value = value.substring(0, 10)
+    }
   }
-  return defaultV
+
+  return value
 }
 
-export const mapAnswersToFormValues = (fields, answers, formValues) => {
+export const mapAnswersToFormValues = (fields = [], answers, formValues) => {
   const initialValuesAux = {}
-  flattenFields(fields || []).forEach((field) => {
+  const answersByFieldId = groupBy(answers, 'fieldId')
+
+  flattenFields(fields).forEach((field) => {
     initialValuesAux[field.id] = mapFieldAnswersToFormValues(
       field,
-      answers,
+      answersByFieldId,
       formValues
     )
   })
@@ -96,22 +105,26 @@ export const mapAnswersToFormValues = (fields, answers, formValues) => {
 
 const mapFormValueToAnswer = (fieldId, fields, value, touched, answers) => {
   const intFieldId = +fieldId
-  if (isNil(value)) {
-    return []
-  }
+
+  if (isNil(value)) return []
 
   const field = fields.find((f) => f.id === intFieldId)
+  const answersWithId = answers.filter(
+    (answer) => answer.id && answer.fieldId === intFieldId
+  )
+
   /*
     field.fieldType !== 'dynamicList': when item is removed and there are no changes on other line item
     touched is undefined.
   */
-  if (!touched && field.fieldType !== 'dynamicList') {
-    const untouchedAnswers = answers.filter(
-      (answer) => answer.fieldId === intFieldId
-    )
-    return untouchedAnswers.map((untouchedAnswer) => ({
+  if (
+    answersWithId.length > 0 &&
+    !touched &&
+    field.fieldType !== 'dynamicList'
+  ) {
+    return answersWithId.map((untouchedAnswer) => ({
       id: +untouchedAnswer.id,
-      fieldId: intFieldId
+      fieldId: intFieldId,
     }))
   }
 
@@ -123,7 +136,7 @@ const mapFormValueToAnswer = (fieldId, fields, value, touched, answers) => {
 
       const mappedValue = value.map((formikListItem, index) => ({
         order: index + 1,
-        answers: Object.keys(omit('_key', formikListItem)).reduce(
+        answers: Object.keys(omit(formikListItem, '_key')).reduce(
           (acc, listItemfieldId) => {
             const values = mapFormValueToAnswer(
               listItemfieldId.replace('FS', ''),
@@ -135,26 +148,29 @@ const mapFormValueToAnswer = (fieldId, fields, value, touched, answers) => {
             return [...acc, ...values]
           },
           []
-        )
+        ),
       }))
+
       return [{ fieldId: intFieldId, value: mappedValue }]
     }
+
     return value.map((op) => ({ fieldId: intFieldId, value: op }))
   }
 
-  if (is(Object, value)) {
+  if (isPlainObject(value)) {
     if (value.fieldType === 'gps') {
       return [
         {
           fieldId: intFieldId,
-          value: { x: value.x, y: value.y }
-        }
+          value: { x: value.x, y: value.y },
+        },
       ]
     }
 
     if (ImagesTypeFields.includes(value.fieldType)) {
       return [{ fieldId: intFieldId, value }]
     }
+
     return []
   }
 
@@ -164,7 +180,7 @@ const mapFormValueToAnswer = (fieldId, fields, value, touched, answers) => {
 export const mapFormValuesToAnswers = (
   formikvalues,
   touchedValues,
-  answers,
+  answers = [],
   fields
 ) => {
   const updatedAnswers = Object.keys(formikvalues).reduce((acc, fieldId) => {

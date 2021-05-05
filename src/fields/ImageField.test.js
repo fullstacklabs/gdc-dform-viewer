@@ -10,9 +10,9 @@ const renderForm = (field, image) => {
       {
         order: 1,
         title: 'Sec 1',
-        fields: [field]
-      }
-    ]
+        fields: [field],
+      },
+    ],
   }
 
   render(
@@ -43,8 +43,8 @@ test('required validation', async () => {
     required: true,
     title: 'field',
     schema: {
-      max: 20
-    }
+      max: 20,
+    },
   }
   renderForm(field, null)
   await waitFor(() =>
@@ -60,16 +60,16 @@ test('size validation', async () => {
     required: true,
     title: 'field',
     schema: {
-      max: 20
-    }
+      max: 20,
+    },
   }
   renderForm(field, {
     uri: 'file://somepath',
     size: 20001,
-    type: 'image/png'
+    type: 'image/png',
   })
   fireEvent.change(screen.queryByTestId('field-input'), {
-    target: { value: 'a' }
+    target: { value: 'a' },
   })
   await waitFor(() =>
     expect(screen.queryByTestId('field-errors')).toHaveTextContent(
@@ -86,16 +86,16 @@ test('type validation', async () => {
     required: true,
     title: 'field',
     schema: {
-      max: 20
-    }
+      max: 20,
+    },
   }
   renderForm(field, {
     uri: 'file://somepath',
     size: 20000,
-    type: 'sometype'
+    type: 'sometype',
   })
   fireEvent.change(screen.queryByTestId('field-input'), {
-    target: { value: 'a' }
+    target: { value: 'a' },
   })
   await waitFor(() =>
     expect(screen.queryByTestId('field-errors')).toHaveTextContent(

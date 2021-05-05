@@ -1,7 +1,6 @@
 import React, { useMemo } from 'react'
 import PropTypes from 'prop-types'
 import { FieldArray } from 'formik'
-import { sort } from 'rambdax'
 import DynamicListFieldBody from './DynamicListFieldBody'
 
 const DynamicListField = ({
@@ -15,7 +14,6 @@ const DynamicListField = ({
   formikValues,
   renderTextField,
   renderNumberField,
-  handleBlur,
   renderCodeField,
   renderGPSField,
   renderDateField,
@@ -24,10 +22,10 @@ const DynamicListField = ({
   renderSignatureField,
   renderTotalizerField,
   renderListItem,
-  allFormFieldsFlatten
+  allFormFieldsFlatten,
 }) => {
   const sortedTemplateFields = useMemo(
-    () => sort((a, b) => a.order - b.order, field.templateFields),
+    () => [...field.templateFields].sort((a, b) => a.order - b.order),
     []
   )
 
@@ -44,7 +42,6 @@ const DynamicListField = ({
           formikValues={formikValues}
           setFieldValue={setFieldValue}
           setFieldTouched={setFieldTouched}
-          handleBlur={handleBlur}
           renderTextField={renderTextField}
           renderNumberField={renderNumberField}
           renderDateField={renderDateField}
@@ -71,7 +68,6 @@ DynamicListField.propTypes = {
   value: PropTypes.arrayOf(PropTypes.object).isRequired,
   renderTextField: PropTypes.func.isRequired,
   renderNumberField: PropTypes.func.isRequired,
-  handleBlur: PropTypes.func.isRequired,
   renderCodeField: PropTypes.func.isRequired,
   renderGPSField: PropTypes.func.isRequired,
   renderDateField: PropTypes.func.isRequired,
@@ -84,7 +80,7 @@ DynamicListField.propTypes = {
   errors: PropTypes.object.isRequired,
   formikValues: PropTypes.object,
   field: PropTypes.object.isRequired,
-  allFormFieldsFlatten: PropTypes.array.isRequired
+  allFormFieldsFlatten: PropTypes.array.isRequired,
 }
 
 export default DynamicListField
