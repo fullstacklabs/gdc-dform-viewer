@@ -1,16 +1,18 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { isNil } from 'lodash'
+// eslint-disable-next-line import/no-cycle
 import { DynamicFieldLineItem } from './DynamicFieldLineItem'
 import { getFieldDefaultValue } from '../helpers/formMapper'
 
 const DynamicListFieldBody = ({
-  setFieldTouched,
-  setFieldValue,
+  field,
   value,
+  setFieldValue,
+  setFieldTouched,
+  handleBlur,
   values,
   errors,
-  field,
   formikValues,
   renderTextField,
   renderNumberField,
@@ -35,9 +37,8 @@ const DynamicListFieldBody = ({
       }
 
       if (!isNil(templateField.schema.defaultValue)) {
-        newTemplateField[`FS${templateField.id}`] = getFieldDefaultValue(
-          templateField
-        )
+        newTemplateField[`FS${templateField.id}`] =
+          getFieldDefaultValue(templateField)
       }
 
       return newTemplateField
@@ -58,6 +59,7 @@ const DynamicListFieldBody = ({
         formikValues={formikValues}
         setFieldValue={setFieldValue}
         setFieldTouched={setFieldTouched}
+        handleBlur={handleBlur}
         renderListItem={renderListItem}
         renderTextField={renderTextField}
         renderNumberField={renderNumberField}
@@ -87,6 +89,7 @@ DynamicListFieldBody.propTypes = {
   setFieldValue: PropTypes.func.isRequired,
   setFieldTouched: PropTypes.func.isRequired,
   error: PropTypes.string,
+  handleBlur: PropTypes.func.isRequired,
 }
 
 export default DynamicListFieldBody

@@ -140,7 +140,7 @@ test('required validation for multiple select', async () => {
   )
 })
 
-test('subform render and valdiations', async () => {
+test.only('subform render and valdiations', async () => {
   const field = {
     id: 1,
     order: 1,

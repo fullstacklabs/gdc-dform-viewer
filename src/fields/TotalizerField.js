@@ -13,7 +13,7 @@ function buildOrderWithReferences(fields, formikValues) {
   }, {})
 }
 
-const TotalizerField = ({ allFormFields, allFormValues, render, field }) => {
+const TotalizerField = ({ field, allFormFields, allFormValues, render }) => {
   let totalizerFuncion
 
   try {

@@ -1,12 +1,13 @@
 import PropTypes from 'prop-types'
 
 const TextField = ({
-  setFieldTouched,
-  setFieldValue,
+  field,
   value,
   error,
+  setFieldValue,
+  setFieldTouched,
+  handleBlur,
   render,
-  field,
   isDynamicListItem,
   removeItem,
   index,
@@ -21,6 +22,7 @@ const TextField = ({
     value,
     error,
     onFieldChange,
+    handleBlur,
     isDynamicListItem,
     removeItem,
     index,
@@ -33,6 +35,7 @@ TextField.propTypes = {
   setFieldTouched: PropTypes.func.isRequired,
   value: PropTypes.string,
   error: PropTypes.string,
+  handleBlur: PropTypes.func.isRequired,
 }
 
 export default TextField

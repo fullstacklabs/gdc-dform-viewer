@@ -31,7 +31,7 @@ const renderForm = (field) => {
           <input
             data-testid='field-input'
             onChange={(e) => onFieldChange(e.target.value)}
-            value={inputValue}
+            value={String(inputValue)}
             readOnly={field.schema.readOnly}
           />
           <div data-testid='field-errors'>{error}</div>

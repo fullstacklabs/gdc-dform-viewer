@@ -1,5 +1,4 @@
 import * as Yup from 'yup'
-import { formatDate, TITLE_FORMAT, parseDate } from '../helpers/dataFormats'
 import {
   isAfter,
   isBefore,
@@ -10,26 +9,7 @@ import {
   endOfDay,
   addMinutes,
 } from 'date-fns'
-
-export const fieldDateSchema = (field) => {
-  let schema = Yup.string()
-    .nullable()
-    .typeError(
-      field.schema.format === 'time'
-        ? `${field.title} debe ser una hora válida`
-        : `${field.title} debe ser una fecha válida`
-    )
-
-  if (field.schema.minCurrentDate) {
-    schema = applyMinCurrentDate(schema, field)
-  } else {
-    schema = applyMinAndMaxValues(schema, field)
-  }
-
-  if (field.required) schema = schema.required('*')
-
-  return { schema }
-}
+import { formatDate, TITLE_FORMAT, parseDate } from '../helpers/dataFormats'
 
 function applyMinAndMaxValues(schema, field) {
   const { format } = field.schema
@@ -79,6 +59,7 @@ function applyMinAndMaxValues(schema, field) {
 function applyMinCurrentDate(schema, field) {
   const { format } = field.schema
 
+  // eslint-disable-next-line func-names
   schema = schema.test('is-after-or-equal-to-current-date', function (dateStr) {
     if (dateStr) {
       const currentDate =
@@ -105,4 +86,24 @@ function applyMinCurrentDate(schema, field) {
   })
 
   return schema
+}
+
+export const fieldDateSchema = (field) => {
+  let schema = Yup.string()
+    .nullable()
+    .typeError(
+      field.schema.format === 'time'
+        ? `${field.title} debe ser una hora válida`
+        : `${field.title} debe ser una fecha válida`
+    )
+
+  if (field.schema.minCurrentDate) {
+    schema = applyMinCurrentDate(schema, field)
+  } else {
+    schema = applyMinAndMaxValues(schema, field)
+  }
+
+  if (field.required) schema = schema.required('*')
+
+  return { schema }
 }

@@ -36,11 +36,11 @@ export default function useImageStore({
     setFieldValue(field.id, initialValue)
   }
 
-  const onImageUploaded = (value) => {
+  const onImageUploaded = (newValue) => {
     setFieldValue(field.id, {
       ...imageSource,
       uploaded: true,
-      answerValue: value,
+      answerValue: newValue,
     })
   }
 
