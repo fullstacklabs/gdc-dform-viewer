@@ -28,7 +28,7 @@ const DForm = ({
   renderDynamicListField,
   renderListItem
 }) => {
-  // const dispatch = useDispatch();
+
   const [currentSectionIndex, setCurrentSectionIndex] = useState(
     initialSectionIndex
   )
