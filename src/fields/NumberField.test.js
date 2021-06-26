@@ -187,7 +187,7 @@ test('float number transformation(two decimals)', async () => {
     target: { value: '1040' },
   })
   await waitFor(() =>
-    expect(screen.queryByTestId('field-input')).toHaveValue('10.40')
+    expect(screen.queryByTestId('field-input')).toHaveValue('10.4')
   )
 
   fireEvent.change(screen.queryByTestId('field-input'), {
@@ -201,7 +201,7 @@ test('float number transformation(two decimals)', async () => {
     target: { value: '1046660' },
   })
   await waitFor(() =>
-    expect(screen.queryByTestId('field-input')).toHaveValue('10466.60')
+    expect(screen.queryByTestId('field-input')).toHaveValue('10466.6')
   )
 
   fireEvent.change(screen.queryByTestId('field-input'), {

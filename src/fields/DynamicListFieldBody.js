@@ -2,6 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { isNil } from 'lodash'
 import { DynamicFieldLineItem } from './DynamicFieldLineItem'
+import { getFieldDefaultValue } from '../helpers/formMapper'
 
 const DynamicListFieldBody = ({
   setFieldTouched,
@@ -33,9 +34,10 @@ const DynamicListFieldBody = ({
         ...acc,
       }
 
-      if (isNil(templateField.schema.defaultValue)) {
-        newTemplateField[`FS${templateField.id}`] =
-          templateField.schema.defaultValue
+      if (!isNil(templateField.schema.defaultValue)) {
+        newTemplateField[`FS${templateField.id}`] = getFieldDefaultValue(
+          templateField
+        )
       }
 
       return newTemplateField

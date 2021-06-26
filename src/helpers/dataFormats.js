@@ -1,10 +1,15 @@
-import { isValid, parse, format } from 'date-fns'
+import { isValid, parse, format, isMatch } from 'date-fns'
 
-// db pattern
+// interal date pattern
 const PATTERN = {
   date: 'yyyy-MM-dd',
-  time: 'HH:mm:ssxxx',
-  'date-time': `yyyy-MM-dd'T'HH:mm:ss.SSSX`,
+  time: 'HH:mm:ss',
+  'date-time': `yyyy-MM-dd'T'HH:mm:ssxxx`,
+  // used for parsing values that comes from the schema
+  // (e.g.) min, max and defaultValue
+  // or directly from db timestamp columns
+  _timeWithTimezone: 'HH:mm:ssxxx',
+  _dateTimeWithTimezone: `yyyy-MM-dd'T'HH:mm:ss.SSSx`,
 }
 
 // user friendly format
@@ -23,7 +28,20 @@ export const TITLE_FORMAT = {
 export function parseDate(field, dateStr) {
   if (!dateStr) return null
 
-  const date = parse(dateStr, PATTERN[field.schema.format], new Date())
+  let date
+
+  const { format: schemaFormat } = field.schema
+
+  if (schemaFormat === 'time' && isMatch(dateStr, PATTERN._timeWithTimezone)) {
+    date = parse(dateStr, PATTERN._timeWithTimezone, new Date())
+  } else if (
+    ['date', 'date-time'].includes(schemaFormat) &&
+    isMatch(dateStr, PATTERN._dateTimeWithTimezone)
+  ) {
+    date = parse(dateStr, PATTERN._dateTimeWithTimezone, new Date())
+  } else {
+    date = parse(dateStr, PATTERN[schemaFormat], new Date())
+  }
 
   return isValid(date) ? date : null
 }

@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react'
 import PropTypes from 'prop-types'
-import { intersection } from 'lodash'
+import { castArray, intersection } from 'lodash'
 import FieldsList from './FieldsList'
 
 const MultipleTypeFormats = ['multipleSelect', 'checkbox']
@@ -48,7 +48,7 @@ const SelectField = ({
     if (!field.subforms?.length || !value?.length) return null
 
     return field.subforms.find(
-      (subform) => intersection(subform.options, [value]).length
+      (subform) => intersection(subform.options, castArray(value)).length
     )
   }, [value])
 

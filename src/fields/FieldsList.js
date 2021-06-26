@@ -126,7 +126,6 @@ const FieldsList = ({
     if (field.fieldType === 'signature') {
       return <SignatureField {...commonProps} render={renderSignatureField} />
     }
-
     if (field.fieldType === 'totalizer') {
       return (
         <TotalizerField
@@ -138,8 +137,10 @@ const FieldsList = ({
         />
       )
     }
-
     if (field.fieldType === 'dynamicList') {
+      // can be undefined while formikValues is being updated by the useEffect
+      if (!value) return null
+
       return (
         <DynamicListField
           {...commonProps}

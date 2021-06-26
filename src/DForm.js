@@ -124,6 +124,7 @@ const DForm = ({
       answers,
       allFormFieldsFlatten
     )
+
     onSubmit(updatedAnswers)
   }
 

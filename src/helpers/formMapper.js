@@ -1,4 +1,6 @@
-import { groupBy, isNil, isPlainObject, omit } from 'lodash'
+import { parseISO } from 'date-fns'
+import { groupBy, isNil, isPlainObject } from 'lodash'
+import { formatDate, parseDate } from './dataFormats'
 
 const ImagesTypeFields = ['image', 'signature']
 
@@ -17,6 +19,22 @@ export const flattenFields = (fields) =>
 export const flattenFormFields = (form) =>
   form.sections.map((section) => flattenFields(section.fields)).flat(Infinity)
 
+export const getFieldDefaultValue = (field) => {
+  if (!field.schema) return
+
+  let { defaultValue } = field.schema
+
+  if (defaultValue && field.fieldType === 'date') {
+    // time defaultValue comes with timezone data from the field schema
+    // we need to parsed it
+    if (field.schema.format === 'time') {
+      defaultValue = formatDate(field, parseDate(field, defaultValue))
+    }
+  }
+
+  return defaultValue
+}
+
 export const mapFieldAnswersToFormValues = (
   field,
   answersByFieldId,
@@ -34,15 +52,12 @@ export const mapFieldAnswersToFormValues = (
   const fieldAnswer = fieldAnswers[0]
 
   if (field.fieldType === 'dynamicList') {
-    if (!fieldAnswer) return []
+    if (!fieldAnswer || !Array.isArray(fieldAnswer.value)) return []
 
     return fieldAnswer.value.map((listItem, index) =>
       field.templateFields.reduce(
         (acc, templateField) => {
-          const listItemAnswersByFieldId = groupBy(
-            listItem.answers,
-            templateField.id
-          )
+          const listItemAnswersByFieldId = groupBy(listItem.answers, 'fieldId')
 
           return {
             ...acc,
@@ -60,7 +75,7 @@ export const mapFieldAnswersToFormValues = (
 
   if (ImagesTypeFields.includes(field.fieldType)) {
     if (!fieldAnswer) return null
-    if (isPlainObject(storedAnswer.value)) return storedAnswer.value
+    if (isPlainObject(fieldAnswer.value)) return fieldAnswer.value
 
     return {
       fieldType: field.fieldType,
@@ -72,16 +87,22 @@ export const mapFieldAnswersToFormValues = (
 
   let value
 
-  if (field.schema) value = field.schema.defaultValue
+  if (field.schema) value = getFieldDefaultValue(field)
 
   if (fieldAnswer) {
     value = fieldAnswer.value
 
-    // workarround to extract only the date value (yyyy-MM-dd)
-    // when the field format is only date
-    // i.e. '2021-05-06 20:00:00' → '2021-05-06'
-    if (field.fieldType === 'date' && field.schema.format === 'date') {
-      value = value.substring(0, 10)
+    if (field.fieldType === 'date') {
+      if (field.schema.format === 'date-time') {
+        // date-time values comes with no timezone format
+        // we need to parse it to internal format with timezone
+        value = formatDate(field, parseISO(value))
+      } else if (field.schema.format === 'date') {
+        // workarround to extract only the date value (yyyy-MM-dd)
+        // when the field format is only date
+        // i.e. '2021-06-30T05:00:00.000Z' → '2021-06-30'
+        value = value.substring(0, 10)
+      }
     }
   }
 
@@ -103,7 +124,13 @@ export const mapAnswersToFormValues = (fields = [], answers, formValues) => {
   return initialValuesAux
 }
 
-const mapFormValueToAnswer = (fieldId, fields, value, touched, answers) => {
+const mapFormValueToAnswer = (
+  fieldId,
+  fields,
+  value,
+  touched,
+  answers = []
+) => {
   const intFieldId = +fieldId
 
   if (isNil(value)) return []
@@ -136,19 +163,19 @@ const mapFormValueToAnswer = (fieldId, fields, value, touched, answers) => {
 
       const mappedValue = value.map((formikListItem, index) => ({
         order: index + 1,
-        answers: Object.keys(omit(formikListItem, '_key')).reduce(
-          (acc, listItemfieldId) => {
-            const values = mapFormValueToAnswer(
-              listItemfieldId.replace('FS', ''),
-              field.templateFields,
-              formikListItem[listItemfieldId],
-              true, // touched[index][listItemfieldId],
-              dynamicFieldAnswer?.value[index]?.answers
-            )
-            return [...acc, ...values]
-          },
-          []
-        ),
+        answers: Object.keys(formikListItem).reduce((acc, listItemfieldId) => {
+          if (listItemfieldId === '_key') return acc
+
+          const values = mapFormValueToAnswer(
+            listItemfieldId.replace('FS', ''),
+            field.templateFields,
+            formikListItem[listItemfieldId],
+            true, // touched[index][listItemfieldId],
+            dynamicFieldAnswer?.value[index]?.answers
+          )
+
+          return [...acc, ...values]
+        }, []),
       }))
 
       return [{ fieldId: intFieldId, value: mappedValue }]
@@ -178,16 +205,16 @@ const mapFormValueToAnswer = (fieldId, fields, value, touched, answers) => {
 }
 
 export const mapFormValuesToAnswers = (
-  formikvalues,
+  formikValues,
   touchedValues,
   answers = [],
   fields
 ) => {
-  const updatedAnswers = Object.keys(formikvalues).reduce((acc, fieldId) => {
+  const updatedAnswers = Object.keys(formikValues).reduce((acc, fieldId) => {
     const newAnswers = mapFormValueToAnswer(
       fieldId,
       fields,
-      formikvalues[fieldId],
+      formikValues[fieldId],
       touchedValues[fieldId],
       answers
     )

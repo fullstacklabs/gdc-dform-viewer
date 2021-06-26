@@ -28,7 +28,9 @@ const renderForm = (field) => {
         <div>
           <input
             data-testid='field-input'
-            onChange={(e) => onFieldChange(e.target.value)}
+            onChange={(e) => {
+              onFieldChange(new Date(e.target.value))
+            }}
             value={value || ''}
             readOnly={field.schema.readOnly}
           />
@@ -47,7 +49,7 @@ test('default date value', async () => {
     fieldType: 'date',
     schema: {
       format: 'date',
-      defaultValue: '2020-01-06',
+      defaultValue: '2020-01-06-05:00',
     },
   }
   renderForm(field)
@@ -60,12 +62,12 @@ test('date-time max and min validation', async () => {
   const field = {
     id: 1,
     order: 1,
-    title: 'El num',
+    title: 'La fecha',
     fieldType: 'date',
     schema: {
       format: 'date-time',
-      min: '2020-01-23T00:00:00',
-      max: '2020-09-13T00:00:00',
+      min: '2020-01-23T00:00:00-05:00',
+      max: '2020-09-13T00:00:00-05:00',
     },
   }
   renderForm(field)
@@ -75,7 +77,7 @@ test('date-time max and min validation', async () => {
   })
   await waitFor(() =>
     expect(screen.queryByTestId('field-errors')).toHaveTextContent(
-      'La fecha/hora debe ser mayor o igual a 2020-01-23 12:00 am'
+      'La fecha/hora debe ser mayor o igual a 2020-01-23 12:00 AM'
     )
   )
 
@@ -84,7 +86,7 @@ test('date-time max and min validation', async () => {
   })
   await waitFor(() =>
     expect(screen.queryByTestId('field-errors')).toHaveTextContent(
-      'La fecha/hora debe ser menor o igual a 2020-09-13 12:00 am'
+      'La fecha/hora debe ser menor o igual a 2020-09-13 12:00 AM'
     )
   )
 
@@ -100,7 +102,7 @@ test('time max and min validation', async () => {
   const field = {
     id: 1,
     order: 1,
-    title: 'El num',
+    title: 'La hora',
     fieldType: 'date',
     schema: {
       format: 'time',
@@ -111,25 +113,25 @@ test('time max and min validation', async () => {
   renderForm(field)
 
   fireEvent.change(screen.queryByTestId('field-input'), {
-    target: { value: '2020-01-23T07:59' },
+    target: { value: '2020-01-23T07:59:00-05:00' },
   })
   await waitFor(() =>
     expect(screen.queryByTestId('field-errors')).toHaveTextContent(
-      'La hora debe ser mayor o igual a 08:00 AM'
+      'La hora debe ser mayor o igual a 8:00 AM'
     )
   )
 
   fireEvent.change(screen.queryByTestId('field-input'), {
-    target: { value: '2020-01-23T15:01' },
+    target: { value: '2020-01-23T15:01:00-05:00' },
   })
   await waitFor(() =>
     expect(screen.queryByTestId('field-errors')).toHaveTextContent(
-      'La hora debe ser menor o igual a 03:00 PM'
+      'La hora debe ser menor o igual a 3:00 PM'
     )
   )
 
   fireEvent.change(screen.queryByTestId('field-input'), {
-    target: { value: '2020-01-23T08:00' },
+    target: { value: '2020-01-23T08:00:00-05:00' },
   })
   await waitFor(() =>
     expect(screen.queryByTestId('field-errors')).toBeEmptyDOMElement()
