@@ -1,7 +1,8 @@
 import React, { useEffect, useState, useMemo } from 'react'
 import PropTypes from 'prop-types'
 import { useFormik, FormikProvider } from 'formik'
-import { sectionSchema } from './schema/sectionSchema'
+import { keyBy } from 'lodash'
+import { sectionValidationSchema } from './schema/sectionSchema'
 import FieldsList from './fields/FieldsList'
 
 import {
@@ -11,6 +12,7 @@ import {
 } from './helpers/formMapper'
 
 const DForm = ({
+  order,
   initialSectionIndex = 0,
   form,
   onSubmit,
@@ -28,8 +30,13 @@ const DForm = ({
   renderDynamicListField,
   renderListItem,
 }) => {
-  const [currentSectionIndex, setCurrentSectionIndex] = useState(
-    initialSectionIndex
+  const [currentSectionIndex, setCurrentSectionIndex] =
+    useState(initialSectionIndex)
+  const [sectionConflicts, setSectionConflicts] = useState([])
+
+  const hasSectionErrors = useMemo(
+    () => sectionConflicts.some((err) => err.type === 'error'),
+    [sectionConflicts]
   )
 
   useEffect(() => {
@@ -39,6 +46,10 @@ const DForm = ({
   }, [initialSectionIndex])
 
   const allFormFieldsFlatten = useMemo(() => flattenFormFields(form), [])
+  const allFormFieldsByReferenceId = useMemo(
+    () => keyBy(allFormFieldsFlatten, 'referenceId'),
+    [allFormFieldsFlatten]
+  )
   const orderedSections = useMemo(
     () => form.sections.slice().sort((a, b) => a.order - b.order),
     [form.sections]
@@ -58,9 +69,10 @@ const DForm = ({
     [section]
   )
 
-  const validationSchema = useMemo(() => sectionSchema(section.fields), [
-    section.fields,
-  ])
+  const validationSchema = useMemo(
+    () => sectionValidationSchema(section.fields),
+    [section.fields]
+  )
 
   const formik = useFormik({
     initialValues,
@@ -83,13 +95,71 @@ const DForm = ({
 
   const { isValid, setFieldTouched, setFieldValue, values, errors } = formik
 
+  const sectionValidators = useMemo(() => {
+    if (!section.validators?.length) return []
+
+    try {
+      const validators = section.validators.map(
+        (validatorObj) =>
+          // eslint-disable-next-line no-new-func
+          new Function(
+            'values',
+            'fieldsByReferenceId',
+            'order',
+            validatorObj.func
+          )
+      )
+
+      return validators
+    } catch (error) {
+      setSectionConflicts([
+        {
+          type: 'error',
+          message:
+            'Error al crear los validadores de la sección. Contactar con manager.',
+        },
+      ])
+      return []
+    }
+  }, [section])
+
+  const handleBlur = () => {
+    if (!sectionValidators.length) return
+
+    try {
+      const sectionErrors = sectionValidators
+        .map((sectionValidator) => {
+          return sectionValidator(
+            formikValues,
+            allFormFieldsByReferenceId,
+            order
+          )
+        })
+        .flat()
+        .filter(Boolean) // removes falsy values
+
+      setSectionConflicts(sectionErrors.length ? sectionErrors : [])
+    } catch (error) {
+      setSectionConflicts([
+        {
+          type: 'error',
+          message:
+            'Error al ejecutar los validadores de la sección. Contactar con manager.',
+        },
+      ])
+    }
+  }
+
   const moveToNextSection = () => {
-    if (currentSectionIndex < orderedSections.length - 1)
+    if (currentSectionIndex < orderedSections.length - 1 && !hasSectionErrors) {
       setCurrentSectionIndex(currentSectionIndex + 1)
+    }
   }
 
   const moveToPrevSection = () => {
-    if (currentSectionIndex > 0) setCurrentSectionIndex(currentSectionIndex - 1)
+    if (currentSectionIndex > 0) {
+      setCurrentSectionIndex(currentSectionIndex - 1)
+    }
   }
 
   const renderFields = () => (
@@ -113,11 +183,14 @@ const DForm = ({
         renderDynamicListField={renderDynamicListField}
         renderListItem={renderListItem}
         allFormFieldsFlatten={allFormFieldsFlatten}
+        handleBlur={handleBlur}
       />
     </FormikProvider>
   )
 
   const submit = () => {
+    if (hasSectionErrors) return
+
     const updatedAnswers = mapFormValuesToAnswers(
       formikValues,
       formikTouched,
@@ -137,6 +210,8 @@ const DForm = ({
     submit,
     currentSectionIndex,
     sectionsLength: orderedSections.length,
+    sectionConflicts,
+    hasSectionErrors,
   })
 }
 

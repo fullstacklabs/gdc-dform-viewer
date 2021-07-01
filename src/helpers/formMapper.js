@@ -20,7 +20,7 @@ export const flattenFormFields = (form) =>
   form.sections.map((section) => flattenFields(section.fields)).flat(Infinity)
 
 export const getFieldDefaultValue = (field) => {
-  if (!field.schema) return
+  if (!field.schema) return undefined
 
   let { defaultValue } = field.schema
 

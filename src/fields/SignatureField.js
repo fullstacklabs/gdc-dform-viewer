@@ -2,12 +2,13 @@ import PropTypes from 'prop-types'
 import useImageStore from './useImageStore'
 
 const SignatureField = ({
-  setFieldTouched,
-  setFieldValue,
+  field,
   value,
   error,
+  setFieldValue,
+  setFieldTouched,
+  handleBlur,
   render,
-  field,
 }) => {
   const {
     imageSource,
@@ -34,6 +35,7 @@ const SignatureField = ({
     onImageUploaded,
     onUndo,
     onClear,
+    handleBlur,
     error,
   })
 }
@@ -43,6 +45,7 @@ SignatureField.propTypes = {
   render: PropTypes.func.isRequired,
   setFieldValue: PropTypes.func.isRequired,
   setFieldTouched: PropTypes.func.isRequired,
+  handleBlur: PropTypes.func.isRequired,
 }
 
 export default SignatureField

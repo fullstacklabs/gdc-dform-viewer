@@ -1,10 +1,12 @@
 import * as Yup from 'yup'
 import { fieldSchema } from './fieldSchema'
 
-export const sectionSchema = (sectionFields) => {
+export const sectionValidationSchema = (sectionFields) => {
   let validationSchema = {}
+
   sectionFields.forEach((field) => {
     const { schema, subformSchema } = fieldSchema(field)
+
     if (schema) {
       validationSchema[field.id] = schema
     }
@@ -16,5 +18,6 @@ export const sectionSchema = (sectionFields) => {
       }
     }
   })
+
   return Yup.object().shape(validationSchema)
 }

@@ -1,17 +1,19 @@
 import React, { useMemo } from 'react'
 import PropTypes from 'prop-types'
 import { castArray, intersection } from 'lodash'
+// eslint-disable-next-line import/no-cycle
 import FieldsList from './FieldsList'
 
 const MultipleTypeFormats = ['multipleSelect', 'checkbox']
 
 const SelectField = ({
-  setFieldTouched,
-  setFieldValue,
+  field,
   value,
   error,
+  setFieldValue,
+  setFieldTouched,
+  handleBlur,
   render,
-  field,
   errors,
   values,
   formikValues,
@@ -29,18 +31,18 @@ const SelectField = ({
   removeItem,
   index,
 }) => {
-  const onFieldChange = (value) => {
-    let newValue = value // selected item(s)
+  const onFieldChange = (newValue) => {
+    let arrValue = newValue // selected item(s)
 
     if (
       MultipleTypeFormats.includes(field.schema.format) &&
-      !Array.isArray(newValue)
+      !Array.isArray(arrValue)
     ) {
-      newValue = newValue ? [newValue] : []
+      arrValue = arrValue ? [arrValue] : []
     }
 
     setFieldTouched(field.id, true)
-    setFieldValue(field.id, newValue)
+    setFieldValue(field.id, arrValue)
   }
 
   const activeSubform = useMemo(() => {
@@ -73,6 +75,7 @@ const SelectField = ({
         renderSignatureField={renderSignatureField}
         renderTotalizerField={renderTotalizerField}
         allFormFieldsFlatten={allFormFieldsFlatten}
+        handleBlur={handleBlur}
       />
     )
   }
@@ -82,6 +85,7 @@ const SelectField = ({
     value,
     error,
     onFieldChange,
+    handleBlur,
     isSubFormActive: !!activeSubform,
     renderSubForm,
     isDynamicListItem,
@@ -96,6 +100,7 @@ SelectField.propTypes = {
   setFieldTouched: PropTypes.func.isRequired,
   value: PropTypes.oneOfType([PropTypes.string, PropTypes.array]),
   error: PropTypes.string,
+  handleBlur: PropTypes.func.isRequired,
 }
 
 export default SelectField

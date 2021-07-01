@@ -2,12 +2,13 @@ import PropTypes from 'prop-types'
 import useImageStore from './useImageStore'
 
 const ImageField = ({
-  setFieldTouched,
-  setFieldValue,
+  field,
   value,
   error,
+  setFieldValue,
+  setFieldTouched,
+  handleBlur,
   render,
-  field,
   isDynamicListItem,
   removeItem,
   index,
@@ -37,6 +38,7 @@ const ImageField = ({
     onImageUploaded,
     onUndo,
     onClear,
+    handleBlur,
     error,
     isDynamicListItem,
     removeItem,
@@ -54,6 +56,7 @@ ImageField.propTypes = {
     type: PropTypes.string,
   }),
   error: PropTypes.string,
+  handleBlur: PropTypes.func.isRequired,
 }
 
 export default ImageField
