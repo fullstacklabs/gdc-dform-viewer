@@ -1,6 +1,5 @@
 import DForm from './DForm'
+import Fields from './fields'
+import { fieldSchema } from './schema/fieldSchema'
 
-export { fieldSchema } from './schema/fieldSchema'
-export { default as Fields } from './fields'
-
-export default DForm
+export { DForm, Fields, fieldSchema }

@@ -25,5 +25,5 @@ export default {
   SelectField,
   SignatureField,
   TextField,
-  TotalizerField
+  TotalizerField,
 }

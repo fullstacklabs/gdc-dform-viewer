@@ -1,33 +1,30 @@
-// import React from 'react';
 import PropTypes from 'prop-types'
 import useImageStore from './useImageStore'
 
 const ImageField = ({
   setFieldTouched,
   setFieldValue,
-  handleBlur,
   value,
   error,
   render,
   field,
   isDynamicListItem,
   removeItem,
-  index
+  index,
 }) => {
   const {
     imageSource,
-    canUndo,
-    canClear,
     onSave,
+    onImageUploaded,
     onUndo,
     onClear,
-    errorUploading
+    canUndo,
+    canClear,
   } = useImageStore({
     field,
     value,
     setFieldValue,
     setFieldTouched,
-    handleBlur
   })
 
   return render({
@@ -37,13 +34,13 @@ const ImageField = ({
     canUndo,
     canClear,
     onSave,
+    onImageUploaded,
     onUndo,
     onClear,
     error,
-    errorUploading,
     isDynamicListItem,
     removeItem,
-    index
+    index,
   })
 }
 
@@ -54,10 +51,9 @@ ImageField.propTypes = {
   value: PropTypes.shape({
     uri: PropTypes.string.isRequired,
     size: PropTypes.number,
-    type: PropTypes.string
+    type: PropTypes.string,
   }),
   error: PropTypes.string,
-  handleBlur: PropTypes.func.isRequired
 }
 
 export default ImageField

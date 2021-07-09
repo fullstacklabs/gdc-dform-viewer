@@ -10,9 +10,9 @@ const renderForm = (field, gps) => {
       {
         order: 1,
         title: 'Sec 1',
-        fields: [field]
-      }
-    ]
+        fields: [field],
+      },
+    ],
   }
 
   render(
@@ -25,15 +25,19 @@ const renderForm = (field, gps) => {
       onSectionNext={() => {}}
       onSubmit={() => {}}
       renderSection={({ renderFields }) => renderFields()}
-      renderGPSField={({ onFieldChange, error }) => (
-        <div>
-          <input
-            data-testid='field-input'
-            onChange={() => onFieldChange(gps)}
-          />
-          <div data-testid='field-errors'>{error}</div>
-        </div>
-      )}
+      renderGPSField={({ onFieldChange, error }) => {
+        return (
+          <div>
+            <input
+              data-testid='field-input'
+              onChange={(e) => {
+                onFieldChange(e.target.value)
+              }}
+            />
+            <div data-testid='field-errors'>{error}</div>
+          </div>
+        )
+      }}
     />
   )
 }
@@ -45,14 +49,12 @@ test('required validation', async () => {
     fieldType: 'gps',
     required: true,
     title: 'field',
-    schema: {}
+    schema: {},
   }
   renderForm(field, { x: 1, y: 2 })
-  await waitFor(() =>
-    expect(screen.queryByTestId('field-errors')).toHaveTextContent('*')
-  )
+
   fireEvent.change(screen.queryByTestId('field-input'), {
-    target: { value: 'a' }
+    target: { value: 'a' },
   })
   await waitFor(() =>
     expect(screen.queryByTestId('field-errors')).toBeEmptyDOMElement()

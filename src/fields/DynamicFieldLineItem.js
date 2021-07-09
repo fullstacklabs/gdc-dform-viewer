@@ -15,7 +15,6 @@ export const DynamicFieldLineItem = ({
   setFieldValue,
   formikRemove,
   setFieldTouched,
-  handleBlur,
   renderTextField,
   renderNumberField,
   renderDateField,
@@ -26,23 +25,21 @@ export const DynamicFieldLineItem = ({
   renderSignatureField,
   renderTotalizerField,
   renderListItem,
-  allFormFieldsFlatten
+  allFormFieldsFlatten,
 }) => {
-  const fields = useMemo(
-    () =>
-      templateFields
-        .filter((field) => {
-          if (field.fieldType === 'select') {
-            return !field.subforms?.length
-          }
-          return allowedTypes.includes(field.fieldType)
-        })
-        .map((templateField) => ({
-          ...templateField,
-          id: `${fieldId}.${index}.FS${templateField.id}`
-        })),
-    [index]
-  )
+  const fields = useMemo(() => {
+    return templateFields
+      .filter((field) => {
+        if (field.fieldType === 'select') {
+          return !field.subforms?.length
+        }
+        return allowedTypes.includes(field.fieldType)
+      })
+      .map((templateField) => ({
+        ...templateField,
+        id: `${fieldId}.${index}.FS${templateField.id}`,
+      }))
+  }, [index])
 
   const removeItem = useCallback(() => {
     formikRemove(index)
@@ -60,7 +57,6 @@ export const DynamicFieldLineItem = ({
         formikValues={formikValues}
         setFieldValue={setFieldValue}
         setFieldTouched={setFieldTouched}
-        handleBlur={handleBlur}
         renderTextField={renderTextField}
         renderNumberField={renderNumberField}
         renderDateField={renderDateField}
@@ -74,7 +70,7 @@ export const DynamicFieldLineItem = ({
         isDynamicListItem
         index={index}
       />
-    )
+    ),
   })
 }
 
@@ -83,7 +79,5 @@ DynamicFieldLineItem.propTypes = {
   fieldId: PropTypes.number.isRequired,
   templateFields: PropTypes.array.isRequired,
   addItem: PropTypes.func.isRequired,
-  // allFormFields: PropTypes.array.isRequired,
-  // allFormikValues: PropTypes.object.isRequired,
-  formikRemove: PropTypes.func.isRequired
+  formikRemove: PropTypes.func.isRequired,
 }

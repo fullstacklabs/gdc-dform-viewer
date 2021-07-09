@@ -1,7 +1,8 @@
-import React, { useCallback } from 'react'
+import React from 'react'
 import PropTypes from 'prop-types'
-import { isNil } from 'rambdax'
+import { isNil } from 'lodash'
 import { DynamicFieldLineItem } from './DynamicFieldLineItem'
+import { getFieldDefaultValue } from '../helpers/formMapper'
 
 const DynamicListFieldBody = ({
   setFieldTouched,
@@ -13,7 +14,6 @@ const DynamicListFieldBody = ({
   formikValues,
   renderTextField,
   renderNumberField,
-  handleBlur,
   renderCodeField,
   renderGPSField,
   renderDateField,
@@ -25,59 +25,60 @@ const DynamicListFieldBody = ({
   renderListItem,
   allFormFieldsFlatten,
   arrayHelpers,
-  templateFields
+  templateFields,
 }) => {
-  const addItem = useCallback((index) => {
-    const lineItemValuesObject = templateFields.reduce(
-      (acc, templateField) => ({
-        _key: new Date().getTime(),
+  const addItem = (index = 0) => {
+    const lineItemValuesObject = templateFields.reduce((acc, templateField) => {
+      const newTemplateField = {
+        _key: Date.now(),
         ...acc,
-        [`FS${templateField.id}`]: isNil(templateField.schema.defaultValue)
-          ? undefined
-          : templateField.schema.defaultValue
-      }),
-      {}
-    )
-    arrayHelpers.insert(index, lineItemValuesObject)
-  }, [])
+      }
 
-  const renderFields = useCallback(
-    () =>
-      values[field.id].map((lineItem, index) => (
-        <DynamicFieldLineItem
-          key={lineItem._key}
-          index={index}
-          fieldId={field.id}
-          templateFields={templateFields}
-          values={values}
-          errors={errors}
-          formikValues={formikValues}
-          setFieldValue={setFieldValue}
-          setFieldTouched={setFieldTouched}
-          handleBlur={handleBlur}
-          renderListItem={renderListItem}
-          renderTextField={renderTextField}
-          renderNumberField={renderNumberField}
-          renderDateField={renderDateField}
-          renderImageField={renderImageField}
-          renderCodeField={renderCodeField}
-          renderGPSField={renderGPSField}
-          renderSelectField={renderSelectField}
-          renderSignatureField={renderSignatureField}
-          renderTotalizerField={renderTotalizerField}
-          allFormFieldsFlatten={allFormFieldsFlatten}
-          formikRemove={arrayHelpers.remove}
-          addItem={addItem}
-        />
-      )),
-    [values[field.id], errors[field.id]]
-  )
+      if (!isNil(templateField.schema.defaultValue)) {
+        newTemplateField[`FS${templateField.id}`] = getFieldDefaultValue(
+          templateField
+        )
+      }
+
+      return newTemplateField
+    }, {})
+
+    arrayHelpers.insert(index, lineItemValuesObject)
+  }
+
+  const renderFields = () =>
+    values[field.id].map((lineItem, index) => (
+      <DynamicFieldLineItem
+        key={lineItem._key}
+        index={index}
+        fieldId={field.id}
+        templateFields={templateFields}
+        values={values}
+        errors={errors}
+        formikValues={formikValues}
+        setFieldValue={setFieldValue}
+        setFieldTouched={setFieldTouched}
+        renderListItem={renderListItem}
+        renderTextField={renderTextField}
+        renderNumberField={renderNumberField}
+        renderDateField={renderDateField}
+        renderImageField={renderImageField}
+        renderCodeField={renderCodeField}
+        renderGPSField={renderGPSField}
+        renderSelectField={renderSelectField}
+        renderSignatureField={renderSignatureField}
+        renderTotalizerField={renderTotalizerField}
+        allFormFieldsFlatten={allFormFieldsFlatten}
+        formikRemove={arrayHelpers.remove}
+        addItem={addItem}
+      />
+    ))
 
   return render({
     value,
     field,
     renderFields,
-    addItem
+    addItem,
   })
 }
 
@@ -85,7 +86,7 @@ DynamicListFieldBody.propTypes = {
   render: PropTypes.func.isRequired,
   setFieldValue: PropTypes.func.isRequired,
   setFieldTouched: PropTypes.func.isRequired,
-  error: PropTypes.string
+  error: PropTypes.string,
 }
 
 export default DynamicListFieldBody

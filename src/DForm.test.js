@@ -3,7 +3,7 @@ import {
   render,
   // fireEvent,
   waitFor,
-  screen
+  screen,
 } from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect'
 import userEvent from '@testing-library/user-event'
@@ -20,7 +20,7 @@ const form = {
           order: 1,
           fieldType: 'text',
           title: 'f8',
-          schema: {}
+          schema: {},
         },
         {
           id: 9,
@@ -29,10 +29,10 @@ const form = {
           title: 'f9',
           schema: {
             format: 'multipleSelect',
-            options: ['A', 'B', 'C']
-          }
-        }
-      ]
+            options: ['A', 'B', 'C'],
+          },
+        },
+      ],
     },
     {
       id: 2,
@@ -44,54 +44,54 @@ const form = {
           fieldType: 'text',
           title: 'f1',
           schema: {
-            min: 2
-          }
+            min: 2,
+          },
         },
         {
           id: 2,
           order: 2,
           fieldType: 'number',
           title: 'f2',
-          schema: {}
+          schema: {},
         },
         {
           id: 3,
           order: 3,
           fieldType: 'gps',
           title: 'f3',
-          schema: {}
+          schema: {},
         },
         {
           id: 4,
           order: 4,
           fieldType: 'signature',
           title: 'f4',
-          schema: {}
+          schema: {},
         },
         {
           id: 5,
           order: 5,
           fieldType: 'image',
           title: 'f5',
-          schema: {}
+          schema: {},
         },
         {
           id: 6,
           order: 6,
           fieldType: 'code',
           title: 'f6',
-          schema: {}
+          schema: {},
         },
         {
           id: 7,
           order: 7,
           fieldType: 'date',
           title: 'f7',
-          schema: {}
-        }
-      ]
-    }
-  ]
+          schema: {},
+        },
+      ],
+    },
+  ],
 }
 
 const renderForm = (props, options = {}) =>
@@ -110,7 +110,7 @@ const renderForm = (props, options = {}) =>
         section,
         moveToNextSection,
         moveToPrevSection,
-        submit
+        submit,
       }) => (
         <div>
           <div data-testid={`section-${section.id}`}>
@@ -263,19 +263,19 @@ test('form submit value map to answers', async () => {
   renderForm(
     {
       initialSectionIndex: 0,
-      onSubmit
+      onSubmit,
     },
     {
       imageObject() {
         return {
           uri: 'file://somepath',
           size: 20000,
-          type: 'image/png'
+          type: 'image/png',
         }
       },
       selectedOptions() {
         return ['B', 'C']
-      }
+      },
     }
   )
   expect(screen.queryByTestId('field-8')).toHaveTextContent('I am a text field')
@@ -303,11 +303,11 @@ test('form submit value map to answers', async () => {
         type: 'image/png',
         uploaded: false,
         stored: false,
-        fieldType: 'image'
-      }
+        fieldType: 'image',
+      },
     },
     { fieldId: 8, value: 'Some text answer 8' },
     { fieldId: 9, value: 'B' },
-    { fieldId: 9, value: 'C' }
+    { fieldId: 9, value: 'C' },
   ])
 })

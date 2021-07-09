@@ -11,9 +11,9 @@ const renderForm = (f) => {
       {
         order: 1,
         title: 'Sec 1',
-        fields: [f]
-      }
-    ]
+        fields: [f],
+      },
+    ],
   }
 
   render(
@@ -85,10 +85,10 @@ test('list items add and remove', async () => {
         fieldType: 'text',
         title: 'field',
         schema: {
-          defaultValue: ''
-        }
-      }
-    ]
+          defaultValue: '',
+        },
+      },
+    ],
   }
   renderForm(field)
   expect(screen.queryByTestId('field-input-0')).not.toBeInTheDocument()
@@ -133,10 +133,10 @@ test('list items validation', async () => {
         schema: {
           defaultValue: '',
           min: 3,
-          max: 4
-        }
-      }
-    ]
+          max: 4,
+        },
+      },
+    ],
   }
   renderForm(field)
   userEvent.click(screen.queryByTestId('add-item'))
@@ -186,10 +186,10 @@ test('list required validation', async () => {
         fieldType: 'text',
         title: 'field',
         schema: {
-          defaultValue: ''
-        }
-      }
-    ]
+          defaultValue: '',
+        },
+      },
+    ],
   }
   renderForm(field)
   await waitFor(() =>

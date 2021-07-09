@@ -9,7 +9,7 @@
   "module": "dist/index.modern.js",
   "source": "src/index.js",
   "engines": {
-    "node": ">=10"
+    "node": ">=14"
   },
   "scripts": {
     "build": "microbundle-crl --no-compress --format modern,cjs",
@@ -25,42 +25,40 @@
     "format": "prettier --write \"**/*.(js|jsx)\""
   },
   "peerDependencies": {
-    "date-fns": "^2.0.0",
-    "react": "^16.13.1",
-    "react-dom": "^16.13.1"
+    "date-fns": "^2.21.3",
+    "react": "^16.14.0",
+    "react-dom": "^16.14.0"
   },
   "devDependencies": {
-    "@testing-library/jest-dom": "^5.11.6",
-    "@testing-library/react": "^11.1.2",
-    "@testing-library/user-event": "^12.2.2",
-    "babel-eslint": "^10.0.3",
-    "cross-env": "^7.0.2",
+    "@babel/core": "^7.14.0",
+    "@babel/eslint-parser": "^7.13.14",
+    "@babel/preset-env": "^7.14.1",
+    "@testing-library/jest-dom": "^5.12.0",
+    "@testing-library/react": "^11.2.6",
+    "@testing-library/user-event": "^12.8.3",
+    "cross-env": "^7.0.3",
     "eslint": "^6.8.0",
-    "eslint-config-airbnb": "^18.2.0",
+    "eslint-config-airbnb": "^18.2.1",
     "eslint-config-prettier": "^6.15.0",
-    "eslint-plugin-import": "^2.22.0",
-    "eslint-plugin-jsx-a11y": "^6.3.1",
-    "eslint-plugin-prettier": "^3.1.4",
-    "eslint-plugin-react": "^7.20.3",
-    "eslint-plugin-react-hooks": "^4.0.8",
+    "eslint-plugin-prettier": "^3.4.0",
     "gh-pages": "^2.2.0",
     "jest-environment-jsdom-sixteen": "^1.0.3",
     "microbundle-crl": "^0.13.10",
     "npm-run-all": "^4.1.5",
-    "prettier": "^2.0.5",
-    "react-scripts": "^3.4.1",
-    "react": "^16.13.1",
-    "react-dom": "^16.13.1",
+    "prettier": "^2.2.1",
+    "react": "^16.14.0",
+    "react-dom": "^16.14.0",
+    "react-scripts": "^3.4.4",
     "user-event": "^4.0.0"
   },
   "files": [
     "dist"
   ],
   "dependencies": {
-    "formik": "^2.1.3",
-    "moment": "^2.29.1",
+    "date-fns": "^2.21.3",
+    "formik": "^2.2.6",
+    "lodash": "^4.17.21",
     "prop-types": "^15.7.2",
-    "rambdax": "^7.0.1",
-    "yup": "^0.29.2"
+    "yup": "^0.32.9"
   }
 }
