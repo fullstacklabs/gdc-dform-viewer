@@ -50,7 +50,7 @@ export default function useImageStore({
     onImageUploaded,
     onUndo,
     onClear,
-    canUndo: initialValue && initialValue.stored,
+    canUndo: initialValue && initialValue.stored && initialValue != value,
     canClear: !!imageSource,
   }
 }
