@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useMemo } from 'react'
 import PropTypes from 'prop-types'
 import { useFormik, FormikProvider } from 'formik'
+import { difference } from 'lodash'
 import { sectionSchema } from './schema/sectionSchema'
 import FieldsList from './fields/FieldsList'
 
@@ -65,7 +66,14 @@ const DForm = ({
     validationSchema,
     validateOnMount: true,
     validateOnChange: true,
-  })
+  });
+
+  // Formik reinitialize is not working when the initialValues change. This is just happening once
+  // the first time you move from a section to another.
+  let sectionValues = values || initialValues;
+  if (values && initialValues) {
+    sectionValues = difference(Object.keys(values), Object.keys(initialValues)).length ? initialValues : values
+  }
 
   useEffect(() => {
     setFormikValues({
@@ -89,11 +97,12 @@ const DForm = ({
     if (currentSectionIndex > 0) setCurrentSectionIndex(currentSectionIndex - 1)
   }
 
+
   const renderFields = () => (
     <FormikProvider value={formik}>
       <FieldsList
         fields={sortedSectionFields}
-        values={values}
+        values={sectionValues}
         errors={errors}
         formikValues={formikValues}
         setFieldValue={setFieldValue}
