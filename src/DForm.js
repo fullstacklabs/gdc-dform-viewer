@@ -67,10 +67,11 @@ const DForm = ({
     validateOnMount: true,
     validateOnChange: true,
   });
+  const { isValid, setFieldTouched, setFieldValue, values, errors } = formik
 
   // Formik reinitialize is not working when the initialValues change. This is just happening once
   // the first time you move from a section to another.
-  let sectionValues = values || initialValues;
+  let sectionValues = values;
   if (values && initialValues) {
     sectionValues = difference(Object.keys(values), Object.keys(initialValues)).length ? initialValues : values
   }
@@ -85,8 +86,6 @@ const DForm = ({
       ...formik.touched,
     })
   }, [formik.values, formik.touched])
-
-  const { isValid, setFieldTouched, setFieldValue, values, errors } = formik
 
   const moveToNextSection = () => {
     if (currentSectionIndex < orderedSections.length - 1)
