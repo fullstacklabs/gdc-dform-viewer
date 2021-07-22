@@ -45,9 +45,8 @@ export const mapFieldAnswersToFormValues = (
 
   const fieldAnswers = answersByFieldId[field.id] || []
 
-  if (field.fieldType === 'select' && field.schema.multiple) {
+  if (field.fieldType === 'select' && field.schema.multiple)
     return fieldAnswers.map((answer) => answer.value)
-  }
 
   const fieldAnswer = fieldAnswers[0]
 

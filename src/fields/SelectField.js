@@ -29,22 +29,28 @@ const SelectField = ({
   removeItem,
   index,
 }) => {
-  const onFieldChange = (value) => {
-    let newValue = value // selected item(s)
+  const isMultiple = MultipleTypeFormats.includes(field.schema.format)
 
-    if (
-      MultipleTypeFormats.includes(field.schema.format) &&
-      !Array.isArray(newValue)
-    ) {
-      newValue = newValue ? [newValue] : []
+  const onFieldChange = (newValue) => {
+    let arrValue = castArray(newValue) // selected item(s)
+
+    if (!isMultiple && value && arrValue[0] === value[0]) {
+      // to de-select already selected option
+      arrValue = []
     }
 
     setFieldTouched(field.id, true)
-    setFieldValue(field.id, newValue)
+    // we check that all new selected options are present in the field schema options definition
+    // to prevent saving unkown options
+    if (
+      intersection(arrValue, field.schema.options).length === arrValue.length
+    ) {
+      setFieldValue(field.id, arrValue)
+    }
   }
 
   const activeSubform = useMemo(() => {
-    if (MultipleTypeFormats.includes(field.schema.format)) return null
+    if (isMultiple) return null
     if (!field.subforms?.length || !value?.length) return null
 
     return field.subforms.find(
