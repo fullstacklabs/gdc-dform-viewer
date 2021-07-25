@@ -200,6 +200,10 @@ const mapFormValueToAnswer = (
     return []
   }
 
+  if (field.fieldType === 'text' && field?.schema?.format === 'email' && !value) {
+    return []
+  }
+
   return [{ fieldId: intFieldId, value }]
 }
 
