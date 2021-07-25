@@ -98,7 +98,7 @@ const renderForm = (props, options = {}) =>
   render(
     <DForm
       form={form}
-      initialSectionIndex={0}
+      sectionIndex={options.initialSectionIndex || 0}
       answers={[]}
       formikValues={{}}
       formikTouched={{}}
@@ -199,7 +199,7 @@ const renderForm = (props, options = {}) =>
   )
 
 test('renders form section', async () => {
-  renderForm({ initialSectionIndex: 1 })
+  renderForm(null, { initialSectionIndex: 1 })
   expect(screen.queryByTestId('field-1')).toHaveTextContent('I am a text field')
   expect(screen.queryByTestId('field-2')).toHaveTextContent(
     'I am a number field'
@@ -216,7 +216,7 @@ test('renders form section', async () => {
 })
 
 test('move between sections and validate', async () => {
-  renderForm({ initialSectionIndex: 0 })
+  renderForm()
   expect(screen.queryByTestId('field-8')).toHaveTextContent('I am a text field')
   expect(screen.queryByTestId('section-1')).toHaveTextContent('IS VALID')
   userEvent.click(screen.queryByTestId('move-to-next-section'))
@@ -240,7 +240,7 @@ test('move between sections and validate', async () => {
 })
 
 test('values persitance when moving through sections', async () => {
-  renderForm({ initialSectionIndex: 0 })
+  renderForm();
   userEvent.type(screen.queryByTestId('field-input-8'), 'Some text answer 8')
   userEvent.click(screen.queryByTestId('move-to-next-section'))
   userEvent.type(screen.queryByTestId('field-input-1'), 'Some text answer 1')
@@ -262,7 +262,6 @@ test('form submit value map to answers', async () => {
   const onSubmit = jest.fn()
   renderForm(
     {
-      initialSectionIndex: 0,
       onSubmit,
     },
     {
