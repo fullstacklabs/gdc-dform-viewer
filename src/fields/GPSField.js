@@ -9,12 +9,15 @@ const GPSField = ({
   callValidators,
   render,
 }) => {
-  const onFieldChange = ({ x, y }) => {
+  const onFieldChange = (newValue) => {
+    if (newValue) {
+      const { x, y } = newValue
+
+      setFieldValue(field.id, { x, y })
+    } else {
+      setFieldValue(field.id, null)
+    }
     setFieldTouched(field.id, true)
-    setFieldValue(field.id, {
-      x,
-      y,
-    })
   }
 
   return render({
