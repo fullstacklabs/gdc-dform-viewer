@@ -31,6 +31,7 @@ export const fieldSelectSchema = (field) => {
             )
           },
           then: fieldSchema(subformField).schema,
+          otherwise: Yup.string(),
         })
       })
     })
