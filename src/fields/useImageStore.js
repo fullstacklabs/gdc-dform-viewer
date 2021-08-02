@@ -6,6 +6,28 @@ export default function useImageStore({
   setFieldValue,
   setFieldTouched,
 }) {
+
+  // const getInitalValueFromField = fieldId => {
+  //   if (typeof fieldId !== 'string') {
+  //     return values[fieldId];
+  //   }
+
+  //   const keysTree = fieldId?.split('.');
+  //   const deepSearchValue = (keysTreeArray, valueObject) => {
+  //     const keyTree = keysTreeArray.shift();
+
+  //     if (keysTreeArray.length === 0) {
+  //       return valueObject[keyTree] || null;
+  //     }
+
+  //     return valueObject[keyTree]
+  //       ? deepSearchValue(keysTreeArray, valueObject[keyTree])
+  //       : valueObject;
+  //   };
+
+  //   return deepSearchValue(keysTree, values);
+  // };
+
   const [initialValue] = useState(value);
   const [imageSource, setImageSource] = useState(initialValue) // TODO: Is this really necessary? it holds the same data as the field value
 

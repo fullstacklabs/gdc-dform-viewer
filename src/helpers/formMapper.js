@@ -1,8 +1,9 @@
 import { parseISO } from 'date-fns'
 import { groupBy, isNil, isPlainObject } from 'lodash'
 import { formatDate, parseDate } from './dataFormats'
+import * as FieldTypes from '../fields/type/FieldType'
 
-const ImagesTypeFields = ['image', 'signature']
+const ImagesTypeFields = [FieldTypes.IMAGE, FieldTypes.SIGNATURE]
 
 export const flattenFields = (fields) =>
   fields.reduce((acc, field) => {
@@ -24,7 +25,7 @@ export const getFieldDefaultValue = (field) => {
 
   let { defaultValue } = field.schema
 
-  if (defaultValue && field.fieldType === 'date') {
+  if (defaultValue && field.fieldType === FieldTypes.DATE) {
     // time defaultValue comes with timezone data from the field schema
     // we need to parsed it
     if (field.schema.format === 'time') {
@@ -41,16 +42,16 @@ export const mapFieldAnswersToFormValues = (
   formValues
 ) => {
   if (formValues[field.id]) return formValues[field.id]
-  if (field.fieldType === 'totalizer') return null
+  if (field.fieldType === FieldTypes.TOTALIZER) return null
 
   const fieldAnswers = answersByFieldId[field.id] || []
 
-  if (field.fieldType === 'select' && field.schema.multiple)
+  if (field.fieldType === FieldTypes.SELECT && field.schema.multiple)
     return fieldAnswers.map((answer) => answer.value)
 
   const fieldAnswer = fieldAnswers[0]
 
-  if (field.fieldType === 'dynamicList') {
+  if (field.fieldType === FieldTypes.DYNAMIC_LIST) {
     if (!fieldAnswer || !Array.isArray(fieldAnswer.value)) return []
 
     return fieldAnswer.value.map((listItem, index) =>
@@ -81,6 +82,7 @@ export const mapFieldAnswersToFormValues = (
       uri: fieldAnswer.value,
       uploaded: true,
       stored: true,
+      textAnswer: storedAnswer.textAnswer,
     }
   }
 
@@ -91,7 +93,7 @@ export const mapFieldAnswersToFormValues = (
   if (fieldAnswer) {
     value = fieldAnswer.value
 
-    if (field.fieldType === 'date') {
+    if (field.fieldType === FieldTypes.DATE) {
       if (field.schema.format === 'date-time') {
         // date-time values comes with no timezone format
         // we need to parse it to internal format with timezone
@@ -146,7 +148,7 @@ const mapFormValueToAnswer = (
   if (
     answersWithId.length > 0 &&
     !touched &&
-    field.fieldType !== 'dynamicList'
+    field.fieldType !== FieldTypes.DYNAMIC_LIST
   ) {
     return answersWithId.map((untouchedAnswer) => ({
       id: +untouchedAnswer.id,
@@ -155,7 +157,7 @@ const mapFormValueToAnswer = (
   }
 
   if (Array.isArray(value)) {
-    if (field.fieldType === 'dynamicList') {
+    if (field.fieldType === FieldTypes.DYNAMIC_LIST) {
       const dynamicFieldAnswer = answers.find(
         (answer) => answer.fieldId === intFieldId
       )
@@ -184,7 +186,7 @@ const mapFormValueToAnswer = (
   }
 
   if (isPlainObject(value)) {
-    if (field.fieldType === 'gps') {
+    if (field.fieldType === FieldTypes.GPS) {
       return [
         {
           fieldId: intFieldId,
@@ -200,7 +202,7 @@ const mapFormValueToAnswer = (
     return []
   }
 
-  if (field.fieldType === 'text' && field?.schema?.format === 'email' && !value) {
+  if (field.fieldType === FieldTypes.TEXT && field?.schema?.format === 'email' && !value) {
     return []
   }
 
