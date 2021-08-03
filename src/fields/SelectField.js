@@ -1,17 +1,19 @@
 import React, { useMemo } from 'react'
 import PropTypes from 'prop-types'
 import { castArray, intersection } from 'lodash'
+// eslint-disable-next-line import/no-cycle
 import FieldsList from './FieldsList'
 
 const MultipleTypeFormats = ['multipleSelect', 'checkbox']
 
 const SelectField = ({
-  setFieldTouched,
-  setFieldValue,
+  field,
   value,
   error,
+  setFieldValue,
+  setFieldTouched,
+  handleBlur,
   render,
-  field,
   errors,
   values,
   formikValues,
@@ -89,6 +91,7 @@ const SelectField = ({
         renderSignatureField={renderSignatureField}
         renderTotalizerField={renderTotalizerField}
         allFormFieldsFlatten={allFormFieldsFlatten}
+        handleBlur={handleBlur}
       />
     )
   }
@@ -98,6 +101,7 @@ const SelectField = ({
     value,
     error,
     onFieldChange,
+    handleBlur,
     isSubFormActive: !!activeSubform,
     renderSubForm,
     isDynamicListItem,
@@ -112,6 +116,7 @@ SelectField.propTypes = {
   setFieldTouched: PropTypes.func.isRequired,
   value: PropTypes.oneOfType([PropTypes.string, PropTypes.array]),
   error: PropTypes.string,
+  handleBlur: PropTypes.func.isRequired,
 }
 
 export default SelectField

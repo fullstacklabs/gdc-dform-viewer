@@ -6,7 +6,7 @@ export default function useImageStore({
   setFieldValue,
   setFieldTouched,
 }) {
-  const [initialValue] = useState(value);
+  const [initialValue] = useState(value)
   const [imageSource, setImageSource] = useState(initialValue) // TODO: Is this really necessary? it holds the same data as the field value
 
   const onSave = async (data) => {
@@ -36,11 +36,11 @@ export default function useImageStore({
     setFieldValue(field.id, initialValue)
   }
 
-  const onImageUploaded = (value) => {
+  const onImageUploaded = (newValue) => {
     setFieldValue(field.id, {
       ...imageSource,
       uploaded: true,
-      answerValue: value,
+      answerValue: newValue,
     })
   }
 

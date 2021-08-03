@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useMemo } from 'react'
 import PropTypes from 'prop-types'
 import { useFormik, FormikProvider } from 'formik'
-import { difference } from 'lodash'
+import { difference, keyBy } from 'lodash'
 import { sectionSchema } from './schema/sectionSchema'
 import FieldsList from './fields/FieldsList'
 
@@ -13,6 +13,7 @@ import {
 
 const DForm = ({
   sectionIndex = 0,
+  order,
   form,
   onSubmit,
   answers = [],
@@ -30,6 +31,12 @@ const DForm = ({
   renderListItem,
 }) => {
   const [currentSectionIndex, setCurrentSectionIndex] = useState(sectionIndex)
+  const [sectionConflicts, setSectionConflicts] = useState([])
+
+  const hasSectionErrors = useMemo(
+    () => sectionConflicts.some((err) => err.type === 'error'),
+    [sectionConflicts]
+  )
 
   useEffect(() => {
     if (currentSectionIndex !== sectionIndex)
@@ -37,6 +44,10 @@ const DForm = ({
   }, [sectionIndex])
 
   const allFormFieldsFlatten = useMemo(() => flattenFormFields(form), [])
+  const allFormFieldsByReferenceId = useMemo(
+    () => keyBy(allFormFieldsFlatten, 'referenceId'),
+    [allFormFieldsFlatten]
+  )
   const orderedSections = useMemo(
     () => form.sections.slice().sort((a, b) => a.order - b.order),
     [form.sections]
@@ -90,8 +101,63 @@ const DForm = ({
     })
   }, [formik.values, formik.touched])
 
+  const sectionValidators = useMemo(() => {
+    if (!section.validators?.length) return []
+
+    try {
+      const validators = section.validators.map(
+        (validatorObj) =>
+          // eslint-disable-next-line no-new-func
+          new Function(
+            'values',
+            'fieldsByReferenceId',
+            'order',
+            validatorObj.func
+          )
+      )
+
+      return validators
+    } catch (error) {
+      setSectionConflicts([
+        {
+          type: 'error',
+          message:
+            'Error al crear los validadores de la sección. Contactar con manager.',
+        },
+      ])
+      return []
+    }
+  }, [section])
+
+  const handleBlur = () => {
+    if (!sectionValidators.length) return
+
+    try {
+      const sectionErrors = sectionValidators
+        .map((sectionValidator) => {
+          return sectionValidator(
+            formikValues,
+            allFormFieldsByReferenceId,
+            order
+          )
+        })
+        .flat()
+        .filter(Boolean) // removes falsy values
+
+      setSectionConflicts(sectionErrors.length ? sectionErrors : [])
+    } catch (error) {
+      setSectionConflicts([
+        {
+          type: 'error',
+          message:
+            'Error al ejecutar los validadores de la sección. Contactar con manager.',
+        },
+      ])
+    }
+  }
+
   const moveToNextSection = () => {
-    if (currentSectionIndex < orderedSections.length - 1)
+    if (currentSectionIndex < orderedSections.length - 1 && !hasSectionErrors)
       setCurrentSectionIndex(currentSectionIndex + 1)
   }
 
@@ -120,11 +186,14 @@ const DForm = ({
         renderDynamicListField={renderDynamicListField}
         renderListItem={renderListItem}
         allFormFieldsFlatten={allFormFieldsFlatten}
+        handleBlur={handleBlur}
       />
     </FormikProvider>
   )
 
   const submit = () => {
+    if (hasSectionErrors) return
+
     const updatedAnswers = mapFormValuesToAnswers(
       formikValues,
       formikTouched,
@@ -145,6 +214,8 @@ const DForm = ({
     currentSectionIndex,
     sectionsLength: orderedSections.length,
     hasUnsavedChanges: Object.keys(formikTouched).length > 0,
+    sectionConflicts,
+    hasSectionErrors,
   })
 }
 

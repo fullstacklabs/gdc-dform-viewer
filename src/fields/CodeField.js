@@ -1,12 +1,13 @@
 import PropTypes from 'prop-types'
 
 const CodeField = ({
-  setFieldTouched,
-  setFieldValue,
+  field,
   value,
   error,
+  setFieldValue,
+  setFieldTouched,
+  handleBlur,
   render,
-  field,
 }) => {
   const onFieldChange = (newValue) => {
     setFieldTouched(field.id, true)
@@ -18,6 +19,7 @@ const CodeField = ({
     value,
     error,
     onFieldChange,
+    handleBlur,
   })
 }
 
@@ -27,6 +29,7 @@ CodeField.propTypes = {
   setFieldTouched: PropTypes.func.isRequired,
   value: PropTypes.string,
   error: PropTypes.string,
+  handleBlur: PropTypes.func.isRequired,
 }
 
 export default CodeField

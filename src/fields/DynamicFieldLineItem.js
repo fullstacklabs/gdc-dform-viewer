@@ -1,5 +1,6 @@
 import React, { useMemo, useCallback } from 'react'
 import PropTypes from 'prop-types'
+// eslint-disable-next-line import/no-cycle
 import FieldsList from './FieldsList'
 
 const allowedTypes = ['text', 'number', 'select', 'date']
@@ -12,9 +13,10 @@ export const DynamicFieldLineItem = ({
   values,
   errors,
   formikValues,
-  setFieldValue,
   formikRemove,
+  setFieldValue,
   setFieldTouched,
+  handleBlur,
   renderTextField,
   renderNumberField,
   renderDateField,
@@ -57,6 +59,7 @@ export const DynamicFieldLineItem = ({
         formikValues={formikValues}
         setFieldValue={setFieldValue}
         setFieldTouched={setFieldTouched}
+        handleBlur={handleBlur}
         renderTextField={renderTextField}
         renderNumberField={renderNumberField}
         renderDateField={renderDateField}
@@ -77,7 +80,9 @@ export const DynamicFieldLineItem = ({
 DynamicFieldLineItem.propTypes = {
   index: PropTypes.number.isRequired,
   fieldId: PropTypes.number.isRequired,
+  // eslint-disable-next-line react/forbid-prop-types
   templateFields: PropTypes.array.isRequired,
   addItem: PropTypes.func.isRequired,
   formikRemove: PropTypes.func.isRequired,
+  handleBlur: PropTypes.func.isRequired,
 }

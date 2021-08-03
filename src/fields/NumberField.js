@@ -41,12 +41,13 @@ const parseNumber = (value, field, asNumber) => {
 }
 
 const NumberField = ({
-  setFieldTouched,
-  setFieldValue,
+  field,
   value, // Number value
   error,
+  setFieldValue,
+  setFieldTouched,
+  handleBlur,
   render,
-  field,
   isDynamicListItem,
   removeItem,
   index,
@@ -70,9 +71,10 @@ const NumberField = ({
   return render({
     field,
     value,
+    error,
     inputValue,
     onFieldChange,
-    error,
+    handleBlur,
     isDynamicListItem,
     removeItem,
     index,
@@ -85,6 +87,7 @@ NumberField.propTypes = {
   setFieldTouched: PropTypes.func.isRequired,
   value: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
   error: PropTypes.string,
+  handleBlur: PropTypes.func.isRequired,
 }
 
 export default NumberField

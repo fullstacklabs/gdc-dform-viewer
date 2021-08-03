@@ -4,12 +4,13 @@ import {
   // fireEvent,
   waitFor,
   screen,
+  fireEvent,
 } from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect'
 import userEvent from '@testing-library/user-event'
 import DForm from './DForm'
 
-const form = {
+const baseForm = {
   sections: [
     {
       id: 1,
@@ -21,6 +22,7 @@ const form = {
           fieldType: 'text',
           title: 'f8',
           schema: {},
+          referenceId: 'A1',
         },
         {
           id: 9,
@@ -31,6 +33,7 @@ const form = {
             format: 'multipleSelect',
             options: ['A', 'B', 'C'],
           },
+          referenceId: 'A2',
         },
       ],
     },
@@ -46,6 +49,7 @@ const form = {
           schema: {
             min: 2,
           },
+          referenceId: 'A3',
         },
         {
           id: 2,
@@ -53,6 +57,7 @@ const form = {
           fieldType: 'number',
           title: 'f2',
           schema: {},
+          referenceId: 'A4',
         },
         {
           id: 3,
@@ -60,6 +65,7 @@ const form = {
           fieldType: 'gps',
           title: 'f3',
           schema: {},
+          referenceId: 'A5',
         },
         {
           id: 4,
@@ -67,6 +73,7 @@ const form = {
           fieldType: 'signature',
           title: 'f4',
           schema: {},
+          referenceId: 'A6',
         },
         {
           id: 5,
@@ -74,6 +81,7 @@ const form = {
           fieldType: 'image',
           title: 'f5',
           schema: {},
+          referenceId: 'A7',
         },
         {
           id: 6,
@@ -81,6 +89,7 @@ const form = {
           fieldType: 'code',
           title: 'f6',
           schema: {},
+          referenceId: 'A8',
         },
         {
           id: 7,
@@ -88,17 +97,21 @@ const form = {
           fieldType: 'date',
           title: 'f7',
           schema: {},
+          referenceId: 'A9',
         },
       ],
     },
   ],
 }
 
-const renderForm = (props, options = {}) =>
-  render(
+const renderForm = (
+  props,
+  { form = baseForm, imageObject, selectedOptions } = {}
+) => {
+  return render(
     <DForm
       form={form}
-      sectionIndex={options.initialSectionIndex || 0}
+      sectionIndex={0}
       answers={[]}
       formikValues={{}}
       formikTouched={{}}
@@ -111,6 +124,8 @@ const renderForm = (props, options = {}) =>
         moveToNextSection,
         moveToPrevSection,
         submit,
+        // hasSectionErrors,
+        sectionConflicts,
       }) => (
         <div>
           <div data-testid={`section-${section.id}`}>
@@ -133,12 +148,24 @@ const renderForm = (props, options = {}) =>
             MOVE TO PREV SECTION
           </button>
 
+          {sectionConflicts.length && (
+            <div data-testid='section-conflicts'>
+              {sectionConflicts.map((conflict, idx) => {
+                return (
+                  // eslint-disable-next-line react/no-array-index-key
+                  <div key={idx} data-testid={`section-conflicts-${idx}`}>
+                    {conflict.type} - {conflict.message}
+                  </div>
+                )
+              })}
+            </div>
+          )}
           <button type='button' onClick={submit} data-testid='submit'>
             SUBMIT
           </button>
         </div>
       )}
-      renderTextField={({ value, field, error, onFieldChange }) => (
+      renderTextField={({ value, field, error, onFieldChange, handleBlur }) => (
         <div>
           <div data-testid={`field-${field.id}`}>I am a text field</div>
           <input
@@ -146,6 +173,7 @@ const renderForm = (props, options = {}) =>
             onChange={(e) => onFieldChange(e.target.value)}
             value={value || ''}
             readOnly={field.schema.readOnly}
+            onBlur={handleBlur}
           />
           <div data-testid={`field-error-${field.id}`}>{error}</div>
         </div>
@@ -172,7 +200,7 @@ const renderForm = (props, options = {}) =>
           <div data-testid={`field-${field.id}`}>I am a image field</div>
           <input
             data-testid={`field-input-${field.id}`}
-            onChange={() => onSave(options.imageObject())}
+            onChange={() => onSave(imageObject())}
             value={value || ''}
           />
         </div>
@@ -188,7 +216,7 @@ const renderForm = (props, options = {}) =>
           <div data-testid={`field-${field.id}`}>I am a select field</div>
           <input
             data-testid={`field-input-${field.id}`}
-            onChange={() => onFieldChange(options.selectedOptions())}
+            onChange={() => onFieldChange(selectedOptions())}
             value={value || ''}
           />
         </div>
@@ -197,9 +225,10 @@ const renderForm = (props, options = {}) =>
       {...props}
     />
   )
+}
 
 test('renders form section', async () => {
-  renderForm(null, { initialSectionIndex: 1 })
+  renderForm({ sectionIndex: 1 })
   expect(screen.queryByTestId('field-1')).toHaveTextContent('I am a text field')
   expect(screen.queryByTestId('field-2')).toHaveTextContent(
     'I am a number field'
@@ -213,6 +242,298 @@ test('renders form section', async () => {
   )
   expect(screen.queryByTestId('field-6')).toHaveTextContent('I am a code field')
   expect(screen.queryByTestId('field-7')).toHaveTextContent('I am a date field')
+})
+
+test('renders form with a section conflict error because invalid section validators functions', async () => {
+  const form = { ...baseForm }
+  form.sections = [...form.sections]
+  form.sections[0] = {
+    ...form.sections[0],
+    validators: [
+      {
+        func: `wrong syntax for function`,
+      },
+    ],
+  }
+
+  renderForm({ initialSectionIndex: 0 }, { form })
+  expect(screen.queryByTestId('section-conflicts')).toHaveTextContent(
+    'error - Error al crear los validadores de la sección. Contactar con manager.'
+  )
+})
+
+test('renders form with a section conflict error because of runtime error in section validators functions', async () => {
+  const form = { ...baseForm }
+  form.sections = [...form.sections]
+  form.sections[0] = {
+    ...form.sections[0],
+    validators: [
+      {
+        func: `throw new Error("runtime error in validator")`,
+      },
+    ],
+  }
+
+  renderForm({ initialSectionIndex: 0 }, { form })
+
+  expect(screen.queryByTestId('field-input-8')).toBeInTheDocument()
+
+  fireEvent.blur(screen.queryByTestId('field-input-8'))
+
+  expect(screen.queryByTestId('section-conflicts')).toHaveTextContent(
+    'error - Error al ejecutar los validadores de la sección. Contactar con manager.'
+  )
+})
+
+test('renders form with section conflicts because of custom errors returned in section validators function', async () => {
+  const errorConflict = {
+    type: 'error',
+    message: 'Testing error message',
+  }
+  const warningConflict = {
+    type: 'warning',
+    message: 'Testing warning message',
+  }
+
+  const form = { ...baseForm }
+  form.sections = [...form.sections]
+  form.sections[0] = {
+    ...form.sections[0],
+    validators: [
+      {
+        func: `
+        if (values[8] === 'Testing value') {
+          return null
+        } else {
+          return [
+            ${JSON.stringify(errorConflict)},
+            ${JSON.stringify(warningConflict)},
+          ]
+        }
+      `,
+      },
+    ],
+  }
+
+  renderForm({ initialSectionIndex: 0 }, { form })
+
+  expect(screen.queryByTestId('field-input-8')).toBeInTheDocument()
+
+  userEvent.type(
+    screen.queryByTestId('field-input-8'),
+    'Testing value that generates custom error'
+  )
+  fireEvent.blur(screen.queryByTestId('field-input-8'))
+
+  expect(screen.queryByTestId('section-conflicts').childElementCount).toBe(2)
+  expect(screen.queryByTestId('section-conflicts-0')).toHaveTextContent(
+    `${errorConflict.type} - ${errorConflict.message}`
+  )
+  expect(screen.queryByTestId('section-conflicts-1')).toHaveTextContent(
+    `${warningConflict.type} - ${warningConflict.message}`
+  )
+})
+
+test('renders form WITHOUT section conflicts after section validator function being called', async () => {
+  const form = { ...baseForm }
+  form.sections = [...form.sections]
+  form.sections[0] = {
+    ...form.sections[0],
+    validators: [
+      {
+        func: `
+        if (values[8] === 'Testing value') {
+          return null
+        } else {
+          return [
+            {
+              type: 'error',
+              message: 'Testing conflict message',
+            }
+          ]
+        }
+      `,
+      },
+    ],
+  }
+
+  renderForm({ initialSectionIndex: 0 }, { form })
+
+  expect(screen.queryByTestId('field-input-8')).toBeInTheDocument()
+
+  userEvent.type(screen.queryByTestId('field-input-8'), 'Testing value')
+  fireEvent.blur(screen.queryByTestId('field-input-8'))
+
+  expect(screen.queryByTestId('section-conflicts')).not.toBeInTheDocument()
+})
+
+test('renders form WITHOUT section conflicts after two section validators functions being called', async () => {
+  const form = { ...baseForm }
+  form.sections = [...form.sections]
+  form.sections[0] = {
+    ...form.sections[0],
+    validators: [
+      {
+        func: `
+        if (values[8] === 'Testing value') {
+          return null
+        } else {
+          return [
+            {
+              type: 'error',
+              message: 'Testing conflict message',
+            }
+          ]
+        }
+      `,
+      },
+      {
+        func: `
+        if (values[8].startsWith('Testing')) {
+          return null
+        } else {
+          return [
+            {
+              type: 'error',
+              message: 'Testing conflict message',
+            }
+          ]
+        }
+      `,
+      },
+    ],
+  }
+
+  renderForm({ initialSectionIndex: 0 }, { form })
+
+  expect(screen.queryByTestId('field-input-8')).toBeInTheDocument()
+
+  userEvent.type(screen.queryByTestId('field-input-8'), 'Testing value')
+  fireEvent.blur(screen.queryByTestId('field-input-8'))
+
+  expect(screen.queryByTestId('section-conflicts')).not.toBeInTheDocument()
+})
+
+test('renders form WITH section conflicts after two section validators functions being called, one returns error', async () => {
+  const errorConflict = {
+    type: 'error',
+    message: 'Testing error message',
+  }
+
+  const form = { ...baseForm }
+  form.sections = [...form.sections]
+  form.sections[0] = {
+    ...form.sections[0],
+    validators: [
+      {
+        func: `
+        if (values[8] === 'Testing value') {
+          return null
+        } else {
+          return [
+            {
+              type: 'error',
+              message: 'Testing conflict message',
+            }
+          ]
+        }
+      `,
+      },
+      {
+        func: `
+        if (values[8].startsWith('Nope')) {
+          return null
+        } else {
+          return [
+            ${JSON.stringify(errorConflict)}
+          ]
+        }
+      `,
+      },
+    ],
+  }
+
+  renderForm({ initialSectionIndex: 0 }, { form })
+
+  expect(screen.queryByTestId('field-input-8')).toBeInTheDocument()
+
+  userEvent.type(screen.queryByTestId('field-input-8'), 'Testing value')
+  fireEvent.blur(screen.queryByTestId('field-input-8'))
+
+  expect(screen.queryByTestId('section-conflicts').childElementCount).toBe(1)
+  expect(screen.queryByTestId('section-conflicts-0')).toHaveTextContent(
+    `${errorConflict.type} - ${errorConflict.message}`
+  )
+})
+
+test('does NOT move to next section when form section has section conflicts', async () => {
+  const errorConflict = {
+    type: 'error',
+    message: 'Testing error message',
+  }
+
+  const form = { ...baseForm }
+  form.sections = [...form.sections]
+  form.sections[0] = {
+    ...form.sections[0],
+    validators: [
+      {
+        func: `
+        return [
+          ${JSON.stringify(errorConflict)},
+        ]
+      `,
+      },
+    ],
+  }
+
+  renderForm({ initialSectionIndex: 0 }, { form })
+
+  expect(screen.queryByTestId('field-input-8')).toBeInTheDocument()
+
+  fireEvent.blur(screen.queryByTestId('field-input-8'))
+
+  expect(screen.queryByTestId('section-conflicts')).toBeInTheDocument()
+
+  expect(screen.queryByTestId('move-to-next-section')).toBeInTheDocument()
+  userEvent.click(screen.queryByTestId('move-to-next-section'))
+
+  expect(screen.queryByTestId('section-conflicts')).toBeInTheDocument()
+})
+
+test('does NOT submit when form section has section conflicts', async () => {
+  const errorConflict = {
+    type: 'error',
+    message: 'Testing error message',
+  }
+
+  const form = { ...baseForm }
+  form.sections = [...form.sections]
+  form.sections[0] = {
+    ...form.sections[0],
+    validators: [
+      {
+        func: `
+        return [
+          ${JSON.stringify(errorConflict)},
+        ]
+      `,
+      },
+    ],
+  }
+
+  renderForm({ initialSectionIndex: 0 }, { form })
+
+  expect(screen.queryByTestId('field-input-8')).toBeInTheDocument()
+
+  fireEvent.blur(screen.queryByTestId('field-input-8'))
+
+  expect(screen.queryByTestId('section-conflicts')).toBeInTheDocument()
+
+  expect(screen.queryByTestId('submit')).toBeInTheDocument()
+  userEvent.click(screen.queryByTestId('submit'))
+
+  expect(screen.queryByTestId('section-conflicts')).toBeInTheDocument()
 })
 
 test('move between sections and validate', async () => {
@@ -240,7 +561,7 @@ test('move between sections and validate', async () => {
 })
 
 test('values persitance when moving through sections', async () => {
-  renderForm();
+  renderForm()
   userEvent.type(screen.queryByTestId('field-input-8'), 'Some text answer 8')
   userEvent.click(screen.queryByTestId('move-to-next-section'))
   userEvent.type(screen.queryByTestId('field-input-1'), 'Some text answer 1')
