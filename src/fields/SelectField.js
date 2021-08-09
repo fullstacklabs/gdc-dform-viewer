@@ -58,12 +58,22 @@ const SelectField = ({
     )
   }, [value])
 
+  const sortedSubFormFields = useMemo(
+    () => {
+      if (activeSubform) {
+        return activeSubform.fields.slice().sort((a, b) => a.order - b.order)
+      }
+      return []
+    },
+    [activeSubform]
+  )
+
   const renderSubForm = () => {
     if (!activeSubform) return null
 
     return (
       <FieldsList
-        fields={activeSubform.fields}
+        fields={sortedSubFormFields}
         values={values}
         errors={errors}
         formikValues={formikValues}
