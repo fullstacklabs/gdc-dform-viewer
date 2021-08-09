@@ -6,7 +6,7 @@ const GPSField = ({
   error,
   setFieldValue,
   setFieldTouched,
-  handleBlur,
+  callValidators,
   render,
 }) => {
   const onFieldChange = ({ x, y }) => {
@@ -22,7 +22,7 @@ const GPSField = ({
     value,
     error,
     onFieldChange,
-    handleBlur,
+    callValidators,
   })
 }
 
@@ -35,7 +35,7 @@ GPSField.propTypes = {
     y: PropTypes.number.isRequired,
   }),
   error: PropTypes.string,
-  handleBlur: PropTypes.func.isRequired,
+  callValidators: PropTypes.func.isRequired,
 }
 
 export default GPSField

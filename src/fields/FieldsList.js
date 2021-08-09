@@ -21,7 +21,7 @@ const FieldsList = ({
   formikValues,
   setFieldTouched,
   setFieldValue,
-  handleBlur,
+  callValidators,
   renderTextField,
   renderNumberField,
   renderCodeField,
@@ -49,7 +49,7 @@ const FieldsList = ({
       error,
       setFieldValue,
       setFieldTouched,
-      handleBlur,
+      callValidators,
     }
 
     if (field.fieldType === 'text') {

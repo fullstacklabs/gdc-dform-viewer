@@ -8,7 +8,7 @@ const DateField = ({
   error,
   setFieldValue,
   setFieldTouched,
-  handleBlur,
+  callValidators,
   render,
   isDynamicListItem,
   removeItem,
@@ -32,9 +32,9 @@ const DateField = ({
     })
   }, [value])
 
-  const onFieldChange = (newValue) => {
+  const onFieldChange = (newValue, options) => {
     setFieldTouched(field.id, true)
-    setFieldValue(field.id, formatDate(field, newValue))
+    setFieldValue(field.id, formatDate(field, newValue), options)
   }
 
   return render({
@@ -44,7 +44,7 @@ const DateField = ({
     value,
     error,
     onFieldChange,
-    handleBlur,
+    callValidators,
     isDynamicListItem,
     removeItem,
     index,
@@ -56,7 +56,7 @@ DateField.propTypes = {
   setFieldValue: PropTypes.func.isRequired,
   setFieldTouched: PropTypes.func.isRequired,
   error: PropTypes.string,
-  handleBlur: PropTypes.func.isRequired,
+  callValidators: PropTypes.func.isRequired,
 }
 
 export default DateField

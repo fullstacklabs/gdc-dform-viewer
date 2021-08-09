@@ -7,7 +7,7 @@ const ImageField = ({
   error,
   setFieldValue,
   setFieldTouched,
-  handleBlur,
+  callValidators,
   render,
   isDynamicListItem,
   removeItem,
@@ -38,7 +38,7 @@ const ImageField = ({
     onImageUploaded,
     onUndo,
     onClear,
-    handleBlur,
+    callValidators,
     error,
     isDynamicListItem,
     removeItem,
@@ -56,7 +56,7 @@ ImageField.propTypes = {
     type: PropTypes.string,
   }),
   error: PropTypes.string,
-  handleBlur: PropTypes.func.isRequired,
+  callValidators: PropTypes.func.isRequired,
 }
 
 export default ImageField

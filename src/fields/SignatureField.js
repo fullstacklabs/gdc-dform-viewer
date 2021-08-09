@@ -7,7 +7,7 @@ const SignatureField = ({
   error,
   setFieldValue,
   setFieldTouched,
-  handleBlur,
+  callValidators,
   render,
 }) => {
   const {
@@ -35,7 +35,7 @@ const SignatureField = ({
     onImageUploaded,
     onUndo,
     onClear,
-    handleBlur,
+    callValidators,
     error,
   })
 }
@@ -45,7 +45,7 @@ SignatureField.propTypes = {
   render: PropTypes.func.isRequired,
   setFieldValue: PropTypes.func.isRequired,
   setFieldTouched: PropTypes.func.isRequired,
-  handleBlur: PropTypes.func.isRequired,
+  callValidators: PropTypes.func.isRequired,
 }
 
 export default SignatureField

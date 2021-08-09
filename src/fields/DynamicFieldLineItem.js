@@ -16,7 +16,7 @@ export const DynamicFieldLineItem = ({
   formikRemove,
   setFieldValue,
   setFieldTouched,
-  handleBlur,
+  callValidators,
   renderTextField,
   renderNumberField,
   renderDateField,
@@ -59,7 +59,7 @@ export const DynamicFieldLineItem = ({
         formikValues={formikValues}
         setFieldValue={setFieldValue}
         setFieldTouched={setFieldTouched}
-        handleBlur={handleBlur}
+        callValidators={callValidators}
         renderTextField={renderTextField}
         renderNumberField={renderNumberField}
         renderDateField={renderDateField}

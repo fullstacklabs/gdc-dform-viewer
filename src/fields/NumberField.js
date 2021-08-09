@@ -46,7 +46,7 @@ const NumberField = ({
   error,
   setFieldValue,
   setFieldTouched,
-  handleBlur,
+  callValidators,
   render,
   isDynamicListItem,
   removeItem,
@@ -74,7 +74,7 @@ const NumberField = ({
     error,
     inputValue,
     onFieldChange,
-    handleBlur,
+    callValidators,
     isDynamicListItem,
     removeItem,
     index,
@@ -87,7 +87,7 @@ NumberField.propTypes = {
   setFieldTouched: PropTypes.func.isRequired,
   value: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
   error: PropTypes.string,
-  handleBlur: PropTypes.func.isRequired,
+  callValidators: PropTypes.func.isRequired,
 }
 
 export default NumberField

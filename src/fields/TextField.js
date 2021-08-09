@@ -6,7 +6,7 @@ const TextField = ({
   error,
   setFieldValue,
   setFieldTouched,
-  handleBlur,
+  callValidators,
   render,
   isDynamicListItem,
   removeItem,
@@ -22,7 +22,7 @@ const TextField = ({
     value,
     error,
     onFieldChange,
-    handleBlur,
+    callValidators,
     isDynamicListItem,
     removeItem,
     index,
@@ -35,7 +35,7 @@ TextField.propTypes = {
   setFieldTouched: PropTypes.func.isRequired,
   value: PropTypes.string,
   error: PropTypes.string,
-  handleBlur: PropTypes.func.isRequired,
+  callValidators: PropTypes.func.isRequired,
 }
 
 export default TextField

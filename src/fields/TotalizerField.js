@@ -1,17 +1,6 @@
 import { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
-
-function buildOrderWithReferences(fields, formikValues) {
-  return fields.reduce((acc, field) => {
-    if (field.referenceId) {
-      return {
-        ...acc,
-        [field.referenceId]: formikValues[field.id],
-      }
-    }
-    return acc
-  }, {})
-}
+import buildFormValuesByReferenceId from '../helpers/buildFormValuesByReferenceId'
 
 const TotalizerField = ({ field, allFormFields, allFormValues, render }) => {
   let totalizerFuncion
@@ -36,12 +25,14 @@ const TotalizerField = ({ field, allFormFields, allFormValues, render }) => {
   }
 
   const [totalizedValue, setTotalizedValue] = useState(() =>
-    totalizerFuncion(buildOrderWithReferences(allFormFields, allFormValues))
+    totalizerFuncion(buildFormValuesByReferenceId(allFormFields, allFormValues))
   )
 
   useEffect(() => {
     setTotalizedValue(
-      totalizerFuncion(buildOrderWithReferences(allFormFields, allFormValues))
+      totalizerFuncion(
+        buildFormValuesByReferenceId(allFormFields, allFormValues)
+      )
     )
   }, [allFormValues])
 

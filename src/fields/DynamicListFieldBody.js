@@ -10,7 +10,7 @@ const DynamicListFieldBody = ({
   value,
   setFieldValue,
   setFieldTouched,
-  handleBlur,
+  callValidators,
   values,
   errors,
   formikValues,
@@ -59,7 +59,7 @@ const DynamicListFieldBody = ({
         formikValues={formikValues}
         setFieldValue={setFieldValue}
         setFieldTouched={setFieldTouched}
-        handleBlur={handleBlur}
+        callValidators={callValidators}
         renderListItem={renderListItem}
         renderTextField={renderTextField}
         renderNumberField={renderNumberField}
@@ -89,7 +89,7 @@ DynamicListFieldBody.propTypes = {
   setFieldValue: PropTypes.func.isRequired,
   setFieldTouched: PropTypes.func.isRequired,
   error: PropTypes.string,
-  handleBlur: PropTypes.func.isRequired,
+  callValidators: PropTypes.func.isRequired,
 }
 
 export default DynamicListFieldBody

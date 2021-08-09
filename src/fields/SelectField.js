@@ -12,7 +12,7 @@ const SelectField = ({
   error,
   setFieldValue,
   setFieldTouched,
-  handleBlur,
+  callValidators,
   render,
   errors,
   values,
@@ -33,7 +33,7 @@ const SelectField = ({
 }) => {
   const isMultiple = MultipleTypeFormats.includes(field.schema.format)
 
-  const onFieldChange = (newValue) => {
+  const onFieldChange = (newValue, options) => {
     let arrValue = castArray(newValue) // selected item(s)
 
     if (!isMultiple && value && arrValue[0] === value[0]) {
@@ -47,7 +47,7 @@ const SelectField = ({
     if (
       intersection(arrValue, field.schema.options).length === arrValue.length
     ) {
-      setFieldValue(field.id, arrValue)
+      setFieldValue(field.id, arrValue, options)
     }
   }
 
@@ -60,15 +60,12 @@ const SelectField = ({
     )
   }, [value])
 
-  const sortedSubFormFields = useMemo(
-    () => {
-      if (activeSubform) {
-        return activeSubform.fields.slice().sort((a, b) => a.order - b.order)
-      }
-      return []
-    },
-    [activeSubform]
-  )
+  const sortedSubFormFields = useMemo(() => {
+    if (activeSubform) {
+      return activeSubform.fields.slice().sort((a, b) => a.order - b.order)
+    }
+    return []
+  }, [activeSubform])
 
   const renderSubForm = () => {
     if (!activeSubform) return null
@@ -91,7 +88,7 @@ const SelectField = ({
         renderSignatureField={renderSignatureField}
         renderTotalizerField={renderTotalizerField}
         allFormFieldsFlatten={allFormFieldsFlatten}
-        handleBlur={handleBlur}
+        callValidators={callValidators}
       />
     )
   }
@@ -101,7 +98,7 @@ const SelectField = ({
     value,
     error,
     onFieldChange,
-    handleBlur,
+    callValidators,
     isSubFormActive: !!activeSubform,
     renderSubForm,
     isDynamicListItem,
@@ -116,7 +113,7 @@ SelectField.propTypes = {
   setFieldTouched: PropTypes.func.isRequired,
   value: PropTypes.oneOfType([PropTypes.string, PropTypes.array]),
   error: PropTypes.string,
-  handleBlur: PropTypes.func.isRequired,
+  callValidators: PropTypes.func.isRequired,
 }
 
 export default SelectField
