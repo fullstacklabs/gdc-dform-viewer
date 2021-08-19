@@ -3,12 +3,13 @@ import PropTypes from 'prop-types'
 import { formatDate, parseDate } from '../helpers/dataFormats'
 
 const DateField = ({
-  setFieldTouched,
-  setFieldValue,
+  field,
   value, // date string (format to be saved in database)
   error,
+  setFieldValue,
+  setFieldTouched,
+  callValidators,
   render,
-  field,
   isDynamicListItem,
   removeItem,
   index,
@@ -31,9 +32,9 @@ const DateField = ({
     })
   }, [value])
 
-  const onFieldChange = (newValue) => {
+  const onFieldChange = (newValue, options) => {
     setFieldTouched(field.id, true)
-    setFieldValue(field.id, formatDate(field, newValue))
+    setFieldValue(field.id, formatDate(field, newValue), options)
   }
 
   return render({
@@ -43,6 +44,7 @@ const DateField = ({
     value,
     error,
     onFieldChange,
+    callValidators,
     isDynamicListItem,
     removeItem,
     index,
@@ -54,6 +56,7 @@ DateField.propTypes = {
   setFieldValue: PropTypes.func.isRequired,
   setFieldTouched: PropTypes.func.isRequired,
   error: PropTypes.string,
+  callValidators: PropTypes.func.isRequired,
 }
 
 export default DateField

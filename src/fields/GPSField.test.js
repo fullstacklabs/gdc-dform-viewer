@@ -4,7 +4,7 @@ import { render, waitFor, fireEvent, screen } from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect'
 import DForm from '../DForm'
 
-const renderForm = (field, gps) => {
+const renderForm = (field) => {
   const form = {
     sections: [
       {

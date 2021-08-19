@@ -200,7 +200,11 @@ const mapFormValueToAnswer = (
     return []
   }
 
-  if (field.fieldType === 'text' && field?.schema?.format === 'email' && !value) {
+  if (
+    field.fieldType === 'text' &&
+    field?.schema?.format === 'email' &&
+    !value
+  ) {
     return []
   }
 

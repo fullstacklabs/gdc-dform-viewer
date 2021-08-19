@@ -1,16 +1,20 @@
+/* eslint-disable react/require-default-props */
+/* eslint-disable react/forbid-prop-types */
 import React, { useMemo } from 'react'
 import PropTypes from 'prop-types'
 import { FieldArray } from 'formik'
+// eslint-disable-next-line import/no-cycle
 import DynamicListFieldBody from './DynamicListFieldBody'
 
 const DynamicListField = ({
-  setFieldTouched,
-  setFieldValue,
+  field,
   value,
   values,
+  setFieldValue,
+  setFieldTouched,
+  callValidators,
   errors,
   render,
-  field,
   formikValues,
   renderTextField,
   renderNumberField,
@@ -42,6 +46,7 @@ const DynamicListField = ({
           formikValues={formikValues}
           setFieldValue={setFieldValue}
           setFieldTouched={setFieldTouched}
+          callValidators={callValidators}
           renderTextField={renderTextField}
           renderNumberField={renderNumberField}
           renderDateField={renderDateField}
@@ -81,6 +86,7 @@ DynamicListField.propTypes = {
   formikValues: PropTypes.object,
   field: PropTypes.object.isRequired,
   allFormFieldsFlatten: PropTypes.array.isRequired,
+  callValidators: PropTypes.func.isRequired,
 }
 
 export default DynamicListField

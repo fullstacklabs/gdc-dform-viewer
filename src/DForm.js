@@ -4,6 +4,7 @@ import { useFormik, FormikProvider } from 'formik'
 import { difference } from 'lodash'
 import { sectionSchema } from './schema/sectionSchema'
 import FieldsList from './fields/FieldsList'
+import useValidators from './fields/useValidators'
 
 import {
   mapAnswersToFormValues,
@@ -13,6 +14,8 @@ import {
 
 const DForm = ({
   sectionIndex = 0,
+  order,
+  generalFieldsIndex,
   form,
   onSubmit,
   answers = [],
@@ -48,7 +51,9 @@ const DForm = ({
     [section.fields]
   )
 
-  const [formikValues, setFormikValues] = useState({})
+  const [formikValues, setFormikValues] = useState(() =>
+    mapAnswersToFormValues(section.fields, answers, {})
+  )
   const [formikTouched, setFormikTouched] = useState({})
 
   const initialValues = useMemo(
@@ -56,9 +61,17 @@ const DForm = ({
     [section]
   )
 
-  const validationSchema = useMemo(() => sectionSchema(section.fields), [
-    section.fields,
-  ])
+  const validationSchema = useMemo(
+    () => sectionSchema(section.fields),
+    [section.fields]
+  )
+
+  useEffect(() => {
+    setFormikValues({
+      ...mapAnswersToFormValues(section.fields, answers, {}),
+      ...formikValues,
+    })
+  }, [section])
 
   const formik = useFormik({
     initialValues,
@@ -79,24 +92,46 @@ const DForm = ({
       : values
   }
 
-  useEffect(() => {
-    setFormikValues({
-      ...formikValues,
-      ...formik.values,
+  const { hasSectionErrors, callValidators, sectionValidationsResults } =
+    useValidators({
+      order,
+      section,
+      formikValues,
+      allFormFieldsFlatten,
+      generalFieldsIndex,
     })
-    setFormikTouched({
-      ...formikTouched,
-      ...formik.touched,
-    })
-  }, [formik.values, formik.touched])
 
   const moveToNextSection = () => {
-    if (currentSectionIndex < orderedSections.length - 1)
+    if (currentSectionIndex < orderedSections.length - 1 && !hasSectionErrors)
       setCurrentSectionIndex(currentSectionIndex + 1)
   }
 
   const moveToPrevSection = () => {
     if (currentSectionIndex > 0) setCurrentSectionIndex(currentSectionIndex - 1)
+  }
+
+  const setFieldValueProxy = (fieldId, value, options = {}) => {
+    const newFormikValues = {
+      ...formikValues,
+      [fieldId]: value,
+    }
+    setFormikValues(newFormikValues)
+    setFieldValue(fieldId, value)
+    if (options.callValidators) {
+      callValidators(newFormikValues)
+    }
+  }
+
+  const setFormikTouchedProxy = (fieldId, isTouched, shouldValidate) => {
+    setFormikTouched({
+      ...formikTouched,
+      [fieldId]: isTouched,
+    })
+    return setFieldTouched(fieldId, isTouched, shouldValidate)
+  }
+
+  const callValidatorsProxy = () => {
+    return callValidators(formikValues)
   }
 
   const renderFields = () => (
@@ -106,8 +141,8 @@ const DForm = ({
         values={sectionValues}
         errors={errors}
         formikValues={formikValues}
-        setFieldValue={setFieldValue}
-        setFieldTouched={setFieldTouched}
+        setFieldValue={setFieldValueProxy}
+        setFieldTouched={setFormikTouchedProxy}
         renderTextField={renderTextField}
         renderNumberField={renderNumberField}
         renderDateField={renderDateField}
@@ -120,11 +155,13 @@ const DForm = ({
         renderDynamicListField={renderDynamicListField}
         renderListItem={renderListItem}
         allFormFieldsFlatten={allFormFieldsFlatten}
+        callValidators={callValidatorsProxy}
       />
     </FormikProvider>
   )
 
   const submit = () => {
+    if (!callValidatorsProxy()) return
     const updatedAnswers = mapFormValuesToAnswers(
       formikValues,
       formikTouched,
@@ -140,17 +177,20 @@ const DForm = ({
     renderFields,
     moveToPrevSection,
     moveToNextSection,
-    isValid,
+    isValid: isValid && !hasSectionErrors,
     submit,
     currentSectionIndex,
     sectionsLength: orderedSections.length,
     hasUnsavedChanges: Object.keys(formikTouched).length > 0,
+    sectionValidationsResults,
+    hasSectionErrors,
   })
 }
 
 DForm.defaultProps = {
   sectionIndex: 0,
   answers: [],
+  generalFieldsIndex: null,
 }
 
 DForm.propTypes = {
@@ -201,6 +241,10 @@ DForm.propTypes = {
     })
   ),
   onSubmit: PropTypes.func.isRequired,
+  generalFieldsIndex: PropTypes.shape({
+    id: PropTypes.string,
+    referenceId: PropTypes.string,
+  }),
 }
 
 export default DForm

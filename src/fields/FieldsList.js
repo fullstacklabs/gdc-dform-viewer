@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-props-no-spreading */
 import React from 'react'
 import { getIn } from 'formik'
 import TextField from './TextField'
@@ -20,6 +21,7 @@ const FieldsList = ({
   formikValues,
   setFieldTouched,
   setFieldValue,
+  callValidators,
   renderTextField,
   renderNumberField,
   renderCodeField,
@@ -47,6 +49,7 @@ const FieldsList = ({
       error,
       setFieldValue,
       setFieldTouched,
+      callValidators,
     }
 
     if (field.fieldType === 'text') {

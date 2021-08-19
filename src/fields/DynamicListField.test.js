@@ -67,7 +67,6 @@ const renderForm = (f) => {
           <div data-testid={`field-errors-${index}`}>{error}</div>
         </div>
       )}
-
       renderNumberField={() => null}
       renderCodeField={() => null}
     />

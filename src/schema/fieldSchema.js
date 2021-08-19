@@ -1,5 +1,6 @@
 import * as Yup from 'yup'
 import { fieldTextSchema } from './fieldTextSchema'
+// eslint-disable-next-line import/no-cycle
 import { fieldSelectSchema } from './fieldSelectSchema'
 import { fieldDateSchema } from './fieldDateSchema'
 import { fieldImageSchema } from './fieldImageSchema'
@@ -7,6 +8,7 @@ import { fieldNumberSchema } from './fieldNumberSchema'
 import { fieldCodeSchema } from './fieldCodeSchema'
 import { fieldSignatureSchema } from './fieldSignatureSchema'
 import { filedGPSSchema } from './filedGPSSchema'
+// eslint-disable-next-line import/no-cycle
 import { dynamicListFieldSchema } from './dynamicListFieldSchema'
 
 export const fieldSchema = (field) => {

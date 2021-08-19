@@ -1,12 +1,13 @@
 import PropTypes from 'prop-types'
 
 const GPSField = ({
-  setFieldTouched,
-  setFieldValue,
+  field,
   value,
   error,
+  setFieldValue,
+  setFieldTouched,
+  callValidators,
   render,
-  field,
 }) => {
   const onFieldChange = ({ x, y }) => {
     setFieldTouched(field.id, true)
@@ -21,6 +22,7 @@ const GPSField = ({
     value,
     error,
     onFieldChange,
+    callValidators,
   })
 }
 
@@ -33,6 +35,7 @@ GPSField.propTypes = {
     y: PropTypes.number.isRequired,
   }),
   error: PropTypes.string,
+  callValidators: PropTypes.func.isRequired,
 }
 
 export default GPSField
