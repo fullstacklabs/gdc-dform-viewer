@@ -102,6 +102,14 @@ const DForm = ({
     })
 
   const moveToNextSection = () => {
+    // We manually run validation again because under some circumstances Formik's isValid returns true but the
+    // current values don't match the validation schema.
+    // This appears to be a Formik bug, possibly related to https://github.com/formium/formik/issues/1950.
+    // See MOV-622.
+    if (!validationSchema.isValidSync(formikValues)) {
+      return;
+    }
+    
     if (currentSectionIndex < orderedSections.length - 1 && !hasSectionErrors)
       setCurrentSectionIndex(currentSectionIndex + 1)
   }
@@ -161,6 +169,14 @@ const DForm = ({
   )
 
   const submit = () => {
+    // We manually run validation again because under some circumstances Formik's isValid returns true but the
+    // current values don't match the validation schema.
+    // This appears to be a Formik bug, possibly related to https://github.com/formium/formik/issues/1950.
+    // See MOV-622.
+    if (!validationSchema.isValidSync(formikValues)) {
+      return;
+    }
+
     if (!callValidatorsProxy()) return
     const updatedAnswers = mapFormValuesToAnswers(
       formikValues,
