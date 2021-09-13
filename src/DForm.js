@@ -92,14 +92,18 @@ const DForm = ({
       : values
   }
 
-  const { hasSectionErrors, callValidators, sectionValidationsResults } =
-    useValidators({
-      order,
-      section,
-      formikValues,
-      allFormFieldsFlatten,
-      generalFieldsIndex,
-    })
+  const {
+    hasSectionErrors,
+    callValidators,
+    sectionValidationsResults,
+    sectionResultsCounts,
+  } = useValidators({
+    order,
+    section,
+    formikValues,
+    allFormFieldsFlatten,
+    generalFieldsIndex,
+  })
 
   const moveToNextSection = () => {
     // We manually run validation again because under some circumstances Formik's isValid returns true but the
@@ -107,9 +111,9 @@ const DForm = ({
     // This appears to be a Formik bug, possibly related to https://github.com/formium/formik/issues/1950.
     // See MOV-622.
     if (!validationSchema.isValidSync(formikValues)) {
-      return;
+      return
     }
-    
+
     if (currentSectionIndex < orderedSections.length - 1 && !hasSectionErrors)
       setCurrentSectionIndex(currentSectionIndex + 1)
   }
@@ -174,7 +178,7 @@ const DForm = ({
     // This appears to be a Formik bug, possibly related to https://github.com/formium/formik/issues/1950.
     // See MOV-622.
     if (!validationSchema.isValidSync(formikValues)) {
-      return;
+      return
     }
 
     if (!callValidatorsProxy()) return
@@ -200,6 +204,7 @@ const DForm = ({
     hasUnsavedChanges: Object.keys(formikTouched).length > 0,
     sectionValidationsResults,
     hasSectionErrors,
+    sectionResultsCounts,
   })
 }
 

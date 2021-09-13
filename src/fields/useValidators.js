@@ -15,6 +15,54 @@ function buildGeneralFieldValuesByReferenceId(
   }, {})
 }
 
+function incrementResultsCount(
+  newSectionValidationResults,
+  sectionValidationsResults,
+  sectionResultsCounts
+) {
+  return newSectionValidationResults.reduce((acc, sectionResult) => {
+    const hasResultNotCounted = !sectionValidationsResults.find(
+      (oldSectionResult) =>
+        oldSectionResult.validatorId === sectionResult.validatorId &&
+        oldSectionResult.type === sectionResult.type &&
+        (typeof sectionResult.formValue === 'undefined' ||
+          oldSectionResult.formValue === sectionResult.formValue)
+    )
+
+    if (hasResultNotCounted) {
+      const validatorCountIndex = acc.findIndex(
+        (sectionCount) =>
+          sectionCount.sectionValidatorId === sectionResult.validatorId
+      )
+
+      const validatorCount = acc[validatorCountIndex]
+      const resultType = sectionResult.type || 'warning'
+      const countTypeString = `${resultType}Count`
+      if (validatorCount) {
+        return [
+          ...acc.slice(0, validatorCountIndex - 1),
+          {
+            ...validatorCount,
+            [countTypeString]: validatorCount[countTypeString] + 1,
+          },
+          ...acc.slice(validatorCountIndex + 1, acc.length - 1),
+        ]
+      }
+      return [
+        ...acc,
+        {
+          sectionValidatorId: sectionResult.validatorId,
+          warningCount: 0,
+          errorCount: 0,
+          [countTypeString]: 1,
+        },
+      ]
+    }
+
+    return acc
+  }, sectionResultsCounts)
+}
+
 export default function useValidators({
   section,
   order,
@@ -22,6 +70,7 @@ export default function useValidators({
   generalFieldsIndex,
 }) {
   const [sectionValidationsResults, setSectionValidationsResults] = useState([])
+  const [sectionResultsCounts, setSectionResultsCounts] = useState([])
 
   useEffect(() => {
     setSectionValidationsResults([])
@@ -36,13 +85,16 @@ export default function useValidators({
     if (!section.validators?.length) return []
 
     try {
-      const validators = section.validators.map(
-        (validatorObj) =>
-          // eslint-disable-next-line no-new-func
-          new Function('values', 'generFieldValues', 'order', validatorObj.func)
-      )
-
-      return validators
+      return section.validators.map((validator) => ({
+        // eslint-disable-next-line no-new-func
+        validatorFunc: new Function(
+          'values',
+          'generFieldValues',
+          'order',
+          validator.func
+        ),
+        validatorId: validator.id,
+      }))
     } catch (error) {
       setSectionValidationsResults([
         {
@@ -83,14 +135,37 @@ export default function useValidators({
     try {
       const sectionResults = sectionValidators
         .map((sectionValidator) => {
-          return sectionValidator(
+          const result = sectionValidator.validatorFunc(
             formValuesByReferenceId,
             generalFieldValuesByReferenceId,
             order
           )
+
+          if (result) {
+            const extendedResult = {
+              ...result,
+              validatorId: sectionValidator.validatorId,
+            }
+
+            if (result.fieldReferenceId) {
+              extendedResult.formValue =
+                formValuesByReferenceId[result.fieldReferenceId]
+            }
+            return extendedResult
+          }
+          return result
         })
         .flat()
         .filter(Boolean) // removes falsy values
+
+      setSectionResultsCounts(
+        incrementResultsCount(
+          sectionResults,
+          sectionValidationsResults,
+          sectionResultsCounts,
+          formValuesByReferenceId
+        )
+      )
 
       setSectionValidationsResults(sectionResults)
       return !sectionResults.find((result) => result.type === 'error')
@@ -110,5 +185,6 @@ export default function useValidators({
     hasSectionErrors,
     callValidators,
     sectionValidationsResults,
+    sectionResultsCounts,
   }
 }
